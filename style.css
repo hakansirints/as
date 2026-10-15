@@ -222,6 +222,27 @@ body {
   border: 4px solid #ffffff;
   position: relative;
   transition: opacity 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+}
+
+/* Beyaz Kart Üzerinde Zarif, Göze Batmayan Harf & Kelime Filigran Deseni */
+.screen-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--border-radius-lg) - 4px);
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cstyle%3Etext%7Bfont-family:sans-serif;font-weight:800;fill:%23475569;%7D%3C/style%3E%3Ctext x='25' y='45' font-size='26' opacity='0.04' transform='rotate(-12 25 45)'%3EA%3C/text%3E%3Ctext x='110' y='35' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(6 110 35)'%3EKEL%C4%B0ME%3C/text%3E%3Ctext x='230' y='50' font-size='24' opacity='0.04' transform='rotate(15 230 50)'%3EZ%3C/text%3E%3Ctext x='285' y='90' font-size='18' opacity='0.03' transform='rotate(-8 285 90)'%3EB%3C/text%3E%3Ctext x='45' y='120' font-size='13' opacity='0.03' letter-spacing='1' transform='rotate(8 45 120)'%3EOYUN%3C/text%3E%3Ctext x='150' y='115' font-size='28' opacity='0.04' transform='rotate(-18 150 115)'%3E%C3%87%3C/text%3E%3Ctext x='215' y='135' font-size='12' opacity='0.03' letter-spacing='2' transform='rotate(-5 215 135)'%3ETAHM%C4%B0N%3C/text%3E%3Ctext x='20' y='190' font-size='24' opacity='0.04' transform='rotate(14 20 190)'%3EK%3C/text%3E%3Ctext x='95' y='180' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(-10 95 180)'%3EHARF%3C/text%3E%3Ctext x='175' y='195' font-size='22' opacity='0.04' transform='rotate(12 175 195)'%3E%C4%9E%3C/text%3E%3Ctext x='260' y='185' font-size='26' opacity='0.04' transform='rotate(-15 260 185)'%3EM%3C/text%3E%3Ctext x='50' y='265' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(-6 50 265)'%3EB%C4%B0LG%C4%B0%3C/text%3E%3Ctext x='130' y='275' font-size='25' opacity='0.04' transform='rotate(16 130 275)'%3E%C5%9E%3C/text%3E%3Ctext x='210' y='255' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(8 210 255)'%3ENE%C5%9EE%3C/text%3E%3Ctext x='275' y='280' font-size='22' opacity='0.04' transform='rotate(-12 275 280)'%3E%C3%9C%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 320px 320px;
+}
+
+.card-inner,
+.game-board-grid-layout,
+.secret-step-card {
+  position: relative;
+  z-index: 1;
 }
 
 .screen-card.active {
@@ -940,11 +961,17 @@ body {
 }
 
 /* Oyuncular Şeridi */
+.players-turn-strip {
+  padding-top: 6px;
+}
+
 .players-status-list {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 12px 6px 6px 6px;
+  margin-top: -6px;
+  scrollbar-width: thin;
 }
 
 .player-status-card {
@@ -997,10 +1024,12 @@ body {
   right: 6px;
   background: #3b82f6;
   color: white;
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.25);
+  z-index: 5;
 }
 
 .player-status-card.is-master {
@@ -1022,10 +1051,12 @@ body {
   right: 6px;
   background: #ef4444;
   color: white;
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.25);
+  z-index: 5;
 }
 
 /* Sıra Duyurusu */
@@ -1667,9 +1698,14 @@ body {
     gap: 6px;
   }
 
+  .players-turn-strip {
+    padding-top: 4px;
+  }
+
   .players-status-list {
     gap: 6px;
-    padding-bottom: 2px;
+    padding: 10px 4px 4px 4px;
+    margin-top: -4px;
   }
 
   .player-status-card {

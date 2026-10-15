@@ -395,6 +395,29 @@ function renderPlayerInputs() {
       <span class="player-avatar-badge" title="${avatar.name}">${avatar.icon}</span>
       <input type="text" id="player_name_${i}" placeholder="${defaultName}" maxlength="15" value="${defaultName}">
     `;
+
+    const input = row.querySelector('input');
+
+    // Metin kutusuna tıklanınca/odaklanılınca varsayılan isim içeriği (1. Oyuncu vb.) otomatik silinsin
+    input.addEventListener('focus', () => {
+      if (input.value === defaultName) {
+        input.value = '';
+      }
+    });
+
+    input.addEventListener('click', () => {
+      if (input.value === defaultName) {
+        input.value = '';
+      }
+    });
+
+    // Kullanıcı herhangi bir isim girmeden boş bırakıp çıkarsa varsayılan isim geri gelsin
+    input.addEventListener('blur', () => {
+      if (input.value.trim() === '') {
+        input.value = defaultName;
+      }
+    });
+
     DOM.playerInputsList.appendChild(row);
   }
 }
