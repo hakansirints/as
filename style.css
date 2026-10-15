@@ -225,17 +225,67 @@ body {
   overflow: hidden;
 }
 
-/* Beyaz Kart Üzerinde Zarif, Göze Batmayan Harf & Kelime Filigran Deseni */
-.screen-card::before {
-  content: '';
+/* ========================================================
+   BEYAZ OYUN KARTINDA CANLI HARF VE KELİME ANİMASYONLARI
+   ======================================================== */
+.card-letters-watermark {
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--border-radius-lg) - 4px);
+  overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cstyle%3Etext%7Bfont-family:sans-serif;font-weight:800;fill:%23475569;%7D%3C/style%3E%3Ctext x='25' y='45' font-size='26' opacity='0.04' transform='rotate(-12 25 45)'%3EA%3C/text%3E%3Ctext x='110' y='35' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(6 110 35)'%3EKEL%C4%B0ME%3C/text%3E%3Ctext x='230' y='50' font-size='24' opacity='0.04' transform='rotate(15 230 50)'%3EZ%3C/text%3E%3Ctext x='285' y='90' font-size='18' opacity='0.03' transform='rotate(-8 285 90)'%3EB%3C/text%3E%3Ctext x='45' y='120' font-size='13' opacity='0.03' letter-spacing='1' transform='rotate(8 45 120)'%3EOYUN%3C/text%3E%3Ctext x='150' y='115' font-size='28' opacity='0.04' transform='rotate(-18 150 115)'%3E%C3%87%3C/text%3E%3Ctext x='215' y='135' font-size='12' opacity='0.03' letter-spacing='2' transform='rotate(-5 215 135)'%3ETAHM%C4%B0N%3C/text%3E%3Ctext x='20' y='190' font-size='24' opacity='0.04' transform='rotate(14 20 190)'%3EK%3C/text%3E%3Ctext x='95' y='180' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(-10 95 180)'%3EHARF%3C/text%3E%3Ctext x='175' y='195' font-size='22' opacity='0.04' transform='rotate(12 175 195)'%3E%C4%9E%3C/text%3E%3Ctext x='260' y='185' font-size='26' opacity='0.04' transform='rotate(-15 260 185)'%3EM%3C/text%3E%3Ctext x='50' y='265' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(-6 50 265)'%3EB%C4%B0LG%C4%B0%3C/text%3E%3Ctext x='130' y='275' font-size='25' opacity='0.04' transform='rotate(16 130 275)'%3E%C5%9E%3C/text%3E%3Ctext x='210' y='255' font-size='13' opacity='0.03' letter-spacing='2' transform='rotate(8 210 255)'%3ENE%C5%9EE%3C/text%3E%3Ctext x='275' y='280' font-size='22' opacity='0.04' transform='rotate(-12 275 280)'%3E%C3%9C%3C/text%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 320px 320px;
+  border-radius: calc(var(--border-radius-lg) - 4px);
+}
+
+.card-bg-glyph {
+  position: absolute;
+  font-family: var(--font-title);
+  font-weight: 800;
+  color: #475569;
+  opacity: 0.04;
+  user-select: none;
+  line-height: 1;
+  transform-origin: center center;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.8s ease, text-shadow 0.8s ease;
+  will-change: opacity, transform;
+}
+
+/* Rastgele Periyodik Parlama Animasyonları */
+@keyframes glyphGlow1 {
+  0%, 100% { opacity: 0.035; transform: scale(1) rotate(var(--rot, 0deg)); color: #475569; }
+  35% { opacity: 0.04; }
+  50% { opacity: 0.32; transform: scale(1.18) rotate(var(--rot, 0deg)); color: var(--accent-color, #6366f1); text-shadow: 0 0 10px rgba(99, 102, 241, 0.4); }
+  65% { opacity: 0.06; }
+}
+
+@keyframes glyphGlow2 {
+  0%, 100% { opacity: 0.04; transform: scale(1) rotate(var(--rot, 0deg)); color: #475569; }
+  40% { opacity: 0.04; }
+  52% { opacity: 0.30; transform: scale(1.16) rotate(var(--rot, 0deg)); color: var(--accent-color, #ec4899); text-shadow: 0 0 10px rgba(236, 72, 153, 0.4); }
+  64% { opacity: 0.05; }
+}
+
+@keyframes glyphGlow3 {
+  0%, 100% { opacity: 0.035; transform: scale(1) rotate(var(--rot, 0deg)); color: #475569; }
+  30% { opacity: 0.04; }
+  48% { opacity: 0.33; transform: scale(1.2) rotate(var(--rot, 0deg)); color: var(--accent-color, #f59e0b); text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+  62% { opacity: 0.06; }
+}
+
+@keyframes glyphGlow4 {
+  0%, 100% { opacity: 0.04; transform: scale(1) rotate(var(--rot, 0deg)); color: #475569; }
+  42% { opacity: 0.04; }
+  55% { opacity: 0.32; transform: scale(1.17) rotate(var(--rot, 0deg)); color: var(--accent-color, #10b981); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  68% { opacity: 0.05; }
+}
+
+/* Spotlight Anlık Parlama Dalgası */
+.card-bg-glyph.spotlight {
+  opacity: 0.42 !important;
+  transform: scale(1.26) rotate(var(--rot, 0deg)) !important;
+  color: var(--accent-color, #8b5cf6) !important;
+  text-shadow: 0 0 14px rgba(139, 92, 246, 0.45) !important;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
 }
 
 .card-inner,
@@ -1503,6 +1553,9 @@ body {
   .screen-card {
     padding: 14px 12px;
     border-radius: var(--border-radius-md);
+  }
+  .card-bg-glyph {
+    font-size: 0.85em !important;
   }
   .game-board-grid-layout {
     grid-template-columns: 1fr;

@@ -1396,9 +1396,92 @@ if (DOM.hangmanCharacter) {
 }
 
 // ==========================================
+// 15. BEYAZ KART HARF VE KELİME ARKA PLAN EFEKTİ
+// ==========================================
+function initCardLetterBackgrounds() {
+  const cards = document.querySelectorAll('.screen-card');
+  if (!cards.length) return;
+
+  const glyphData = [
+    // 1. Satır
+    { text: 'A', size: 30, rot: -12, top: 7, left: 6, dur: 5.8, delay: -1.2, anim: 'glyphGlow1', color: '#6366f1' },
+    { text: 'KELİME', size: 14, rot: 7, top: 6, left: 28, dur: 7.4, delay: -3.8, anim: 'glyphGlow2', color: '#ec4899' },
+    { text: 'Z', size: 28, rot: 15, top: 8, left: 64, dur: 6.2, delay: -0.6, anim: 'glyphGlow3', color: '#f59e0b' },
+    { text: 'OYUN', size: 14, rot: -8, top: 9, left: 86, dur: 8.5, delay: -4.2, anim: 'glyphGlow4', color: '#10b981' },
+
+    // 2. Satır
+    { text: 'B', size: 24, rot: 10, top: 27, left: 14, dur: 6.9, delay: -2.1, anim: 'glyphGlow2', color: '#06b6d4' },
+    { text: 'Ç', size: 32, rot: -16, top: 25, left: 44, dur: 5.5, delay: -4.0, anim: 'glyphGlow1', color: '#8b5cf6' },
+    { text: 'TAHMİN', size: 13, rot: 6, top: 28, left: 74, dur: 7.8, delay: -1.5, anim: 'glyphGlow3', color: '#f43f5e' },
+
+    // 3. Satır
+    { text: 'HARF', size: 14, rot: -11, top: 48, left: 6, dur: 8.1, delay: -5.3, anim: 'glyphGlow4', color: '#f59e0b' },
+    { text: 'K', size: 28, rot: 14, top: 47, left: 26, dur: 6.3, delay: -2.9, anim: 'glyphGlow3', color: '#3b82f6' },
+    { text: 'Ğ', size: 25, rot: 12, top: 46, left: 56, dur: 7.2, delay: -3.7, anim: 'glyphGlow1', color: '#10b981' },
+    { text: 'M', size: 30, rot: -14, top: 49, left: 84, dur: 6.0, delay: -0.8, anim: 'glyphGlow2', color: '#ec4899' },
+
+    // 4. Satır
+    { text: 'BİLGİ', size: 13, rot: -6, top: 68, left: 10, dur: 7.7, delay: -3.4, anim: 'glyphGlow3', color: '#6366f1' },
+    { text: 'Ş', size: 28, rot: 16, top: 67, left: 38, dur: 6.5, delay: -1.7, anim: 'glyphGlow2', color: '#f59e0b' },
+    { text: 'NEŞE', size: 14, rot: 8, top: 70, left: 68, dur: 8.6, delay: -6.1, anim: 'glyphGlow4', color: '#06b6d4' },
+    { text: 'P', size: 22, rot: -10, top: 69, left: 90, dur: 5.7, delay: -2.4, anim: 'glyphGlow1', color: '#8b5cf6' },
+
+    // 5. Satır
+    { text: 'D', size: 25, rot: -8, top: 88, left: 8, dur: 6.8, delay: -2.6, anim: 'glyphGlow2', color: '#f43f5e' },
+    { text: 'BUL', size: 14, rot: 12, top: 89, left: 32, dur: 7.3, delay: -4.5, anim: 'glyphGlow3', color: '#10b981' },
+    { text: 'Ü', size: 26, rot: -15, top: 86, left: 58, dur: 5.9, delay: -1.3, anim: 'glyphGlow1', color: '#6366f1' },
+    { text: 'PUAN', size: 13, rot: 7, top: 88, left: 82, dur: 8.2, delay: -3.1, anim: 'glyphGlow4', color: '#f59e0b' }
+  ];
+
+  cards.forEach(card => {
+    const old = card.querySelector('.card-letters-watermark');
+    if (old) old.remove();
+
+    const watermark = document.createElement('div');
+    watermark.className = 'card-letters-watermark';
+    watermark.setAttribute('aria-hidden', 'true');
+
+    glyphData.forEach(item => {
+      const span = document.createElement('span');
+      span.className = 'card-bg-glyph';
+      span.textContent = item.text;
+      span.style.fontSize = `${item.size}px`;
+      span.style.top = `${item.top}%`;
+      span.style.left = `${item.left}%`;
+      span.style.setProperty('--rot', `${item.rot}deg`);
+      span.style.setProperty('--accent-color', item.color);
+      span.style.animation = `${item.anim} ${item.dur}s ease-in-out infinite alternate`;
+      span.style.animationDelay = `${item.delay}s`;
+
+      watermark.appendChild(span);
+    });
+
+    card.prepend(watermark);
+  });
+
+  // Belirli aralıklarla rastgele bir harf veya kelimenin saydamlığını ve belirginliğini daha da yükselt
+  setInterval(() => {
+    const activeCard = document.querySelector('.screen-card.active');
+    if (!activeCard) return;
+
+    const glyphs = activeCard.querySelectorAll('.card-bg-glyph');
+    if (!glyphs.length) return;
+
+    const randomIndex = Math.floor(Math.random() * glyphs.length);
+    const chosenGlyph = glyphs[randomIndex];
+
+    chosenGlyph.classList.add('spotlight');
+    setTimeout(() => {
+      chosenGlyph.classList.remove('spotlight');
+    }, 2200);
+  }, 2600);
+}
+
+// ==========================================
 // 16. İLK BAŞLATMA
 // ==========================================
 renderPlayerInputs();
 checkOrientationTip();
+initCardLetterBackgrounds();
 
 
