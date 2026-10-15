@@ -9,6 +9,12 @@
 ## 🌟 Öne Çıkan Özellikler
 
 * **👥 Çok Oyunculu (2 - 4 Kişi):** Arkadaşlarınızla veya ailenizle aynı cihaz üzerinden sırayla oynayın.
+* **🤪 Komik ve Canlı Asılan Adam Maskotu:**
+  * **⚡ Dinamik Vücut Tepkileri:** Her yanlış tahminde karakter panikler; kollarını çılgınca çırpar, bacaklarıyla tekmeler savurur, ip yaylanır ve ter damlacıkları fırlar!
+  * **💬 Eğlenceli Konuşma Baloncuğu:** Hata yaptıkça *"Hop noluyor yahu?!"*, *"Gömleğim kırıştı!"*, *"Tir tir titriyorum!"* gibi komik replikler söyler.
+  * **🥳 Doğru Harf Sevinci:** Doğru harf bilindiğinde neşeyle zıplayıp oyuncuları tebrik eder.
+  * **🪶 İnteraktif Gıdıklama:** Maskota tıkladığınızda kıkırdayıp komik tepkiler verir.
+  * **🎨 Sevimli Karikatür Detayları:** Dönen pervaneli şapka, renkli papyon, çizgili tişört ve spor ayakkabılar.
 * **🦁 Sevimli Hayvan Avatarları:** Her oyuncuya özel karakterler (Aslan, Tilki, Panda, Tavşan).
 * **📱 Tablet ve Mobil Yatay Ekran Uyumu:** 
   * Telefonu veya tableti yan çevirdiğinizde otomatik olarak bölünmüş ekran (Split View) moduna geçer.
@@ -18,7 +24,7 @@
 * **🎯 Doğru Harf Bilen Sırasını Korur:** Kelimede olan bir harfi doğru tahmin eden oyuncu, puanını alıp tekrar harf seçme veya tahmin etme hakkını korur!
 * **💡 Tam Kelime Tahmin Hakkı:** Kelimeyi erken bilen oyuncu **+50 Puan** kazanır; ancak yanlış tahmin yaparsa o turdan elenir.
 * **👑 Adam Asılırsa:** Kimse kelimeyi bulamazsa veya tüm tahminciler elenirse, kelimeyi saklayan oyuncu **100 Puan** kazanır.
-* **🎵 Dahili Web Audio Sesleri:** Neşeli çanlar, sempatik hata sesleri, zafer fanfarı ve alkışlar.
+* **🎵 Dahili Web Audio Sesleri:** Neşeli çanlar, sempatik ve komik hata/yay tonları, gıdıklama sesleri, zafer fanfarı ve alkışlar.
 * **🏆 Şampiyonluk Kürsüsü:** Oyun sonunda 1., 2. ve 3. olanları gösteren podyum ve konfeti kutlaması.
 
 ---

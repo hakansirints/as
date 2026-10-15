@@ -682,6 +682,256 @@ body {
   transition: opacity 0.3s ease-in-out;
 }
 
+/* Konuşma Baloncuğu */
+.hangman-speech-bubble {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  background: #ffffff;
+  border: 2.5px solid #ff9800;
+  color: #c2410c;
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border-radius: 14px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 14px rgba(255, 152, 0, 0.25);
+  pointer-events: none;
+  z-index: 15;
+  max-width: 140px;
+  line-height: 1.25;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.6) translateY(6px);
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hangman-speech-bubble.active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.hangman-speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 20px;
+  border-width: 7px 7px 0 0;
+  border-style: solid;
+  border-color: #ff9800 transparent transparent transparent;
+}
+
+/* Darağacı Karakter Stilleri ve İnteraktiflik */
+.hangman-character {
+  cursor: pointer;
+  user-select: none;
+  transform-origin: 170px 30px;
+  animation: figureIdleSway 3.5s ease-in-out infinite;
+  transition: filter 0.2s ease;
+}
+
+.hangman-character:hover {
+  filter: drop-shadow(0 0 6px rgba(255, 152, 0, 0.5));
+}
+
+/* Şapka Pervanesi */
+.hat-propeller {
+  transform-origin: 170px 55px;
+  animation: propellerIdle 3.5s linear infinite;
+}
+
+.hat-propeller.fast-spin {
+  animation: propellerCrazy 0.5s linear infinite !important;
+}
+
+/* Gözbebeği Canlılık */
+.eye-pupil {
+  transition: transform 0.2s ease;
+}
+
+/* Papyon ve Aksesuarlar */
+.figure-bowtie {
+  transform-origin: 170px 119px;
+  animation: bowtieWiggle 4s ease-in-out infinite;
+}
+
+/* ================== VÜCUT TEPKİLERİ VE ANİMASYONLARI ================== */
+
+/* 1. Şok ve Sallanma Tepkisi (Her Hata Olduğunda Karakter Titrer / Çılgınca Sallanır) */
+.hangman-character.react-shock {
+  animation: hangmanSwayShock 1.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.hangman-character.react-severe {
+  animation: hangmanEarthquake 1.3s ease-in-out !important;
+}
+
+/* 2. Kolların Panikle Çırpınması */
+.arm-left-group.flailing {
+  animation: armFlailLeft 0.32s ease-in-out infinite alternate !important;
+}
+
+.arm-right-group.flailing {
+  animation: armFlailRight 0.32s ease-in-out infinite alternate !important;
+}
+
+/* 3. Bacakların Panikle Tekme Atması */
+.leg-left-group.kicking {
+  animation: legKickLeft 0.28s ease-in-out infinite alternate !important;
+}
+
+.leg-right-group.kicking {
+  animation: legKickRight 0.28s ease-in-out infinite alternate !important;
+}
+
+/* 4. Kafanın Panikle Titremesi */
+.head-group.panicking {
+  animation: headPanicTilt 0.35s ease-in-out infinite alternate !important;
+}
+
+/* 5. Ter Damlası Patlaması */
+.sweat-drops.active {
+  animation: sweatDropBurst 1.2s ease-out forwards !important;
+}
+
+/* 6. İpin Esnemesi / Zıplaması */
+.gallow-rope.springing {
+  animation: ropeSpring 0.8s ease-out !important;
+}
+
+/* 7. Doğru Harf Sevinç Zıplaması */
+.hangman-character.react-happy {
+  animation: happyBounceCheer 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* 8. Gıdıklama / Tıklama Tepkisi */
+.hangman-character.react-tickle {
+  animation: tickleJiggle 0.6s ease-in-out !important;
+}
+
+/* 9. Oyun Kaybedildiğinde (Asıldı) Yavaş Salınım ve Dönen Yıldızlar */
+.hangman-character.dead-slump {
+  animation: hangmanDeadFloat 2.5s ease-in-out infinite alternate !important;
+}
+
+.dizzy-stars.spinning {
+  animation: dizzySpin 2.5s linear infinite !important;
+}
+
+/* KEYFRAMES */
+
+@keyframes figureIdleSway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+@keyframes propellerIdle {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes propellerCrazy {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1080deg); }
+}
+
+@keyframes bowtieWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  45% { transform: rotate(-5deg); }
+  55% { transform: rotate(5deg); }
+}
+
+@keyframes hangmanSwayShock {
+  0% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-16deg) scale(1.1) translateY(-6px); }
+  30% { transform: rotate(14deg) scale(0.96) translateY(2px); }
+  45% { transform: rotate(-10deg) scale(1.04); }
+  60% { transform: rotate(7deg) scale(0.98); }
+  75% { transform: rotate(-4deg); }
+  90% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes hangmanEarthquake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-5px, -3px) rotate(-12deg); }
+  20% { transform: translate(5px, 3px) rotate(12deg); }
+  30% { transform: translate(-4px, 2px) rotate(-8deg); }
+  40% { transform: translate(4px, -2px) rotate(8deg); }
+  50% { transform: translate(-3px, -3px) rotate(-6deg); }
+  60% { transform: translate(3px, 2px) rotate(6deg); }
+  70% { transform: translate(-2px, 3px) rotate(-3deg); }
+  80% { transform: translate(2px, -2px) rotate(3deg); }
+  90% { transform: translate(-1px, 1px) rotate(-1deg); }
+}
+
+@keyframes armFlailLeft {
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(-55deg) scale(1.08); }
+}
+
+@keyframes armFlailRight {
+  0% { transform: rotate(10deg); }
+  100% { transform: rotate(55deg) scale(1.08); }
+}
+
+@keyframes legKickLeft {
+  0% { transform: rotate(-5deg); }
+  100% { transform: rotate(-38deg) translateY(-5px); }
+}
+
+@keyframes legKickRight {
+  0% { transform: rotate(5deg); }
+  100% { transform: rotate(38deg) translateY(-5px); }
+}
+
+@keyframes headPanicTilt {
+  0% { transform: rotate(-6deg); }
+  100% { transform: rotate(6deg); }
+}
+
+@keyframes sweatDropBurst {
+  0% { opacity: 0; transform: scale(0.2) translateY(4px); }
+  30% { opacity: 1; transform: scale(1.3) translateY(-3px); }
+  80% { opacity: 0.9; transform: scale(1) translateY(8px); }
+  100% { opacity: 0; transform: scale(0.6) translateY(18px); }
+}
+
+@keyframes ropeSpring {
+  0% { stroke-width: 4px; }
+  30% { stroke-width: 5.5px; }
+  60% { stroke-width: 3.5px; }
+  100% { stroke-width: 4px; }
+}
+
+@keyframes happyBounceCheer {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-10px) scale(1.08); }
+  45% { transform: translateY(3px) scale(0.97); }
+  65% { transform: translateY(-5px) scale(1.03); }
+  85% { transform: translateY(1px); }
+}
+
+@keyframes tickleJiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-9deg) scale(1.07); }
+  30% { transform: rotate(9deg) scale(1.07); }
+  45% { transform: rotate(-7deg) scale(1.05); }
+  60% { transform: rotate(7deg) scale(1.05); }
+  75% { transform: rotate(-4deg); }
+  90% { transform: rotate(4deg); }
+}
+
+@keyframes hangmanDeadFloat {
+  0% { transform: rotate(-4deg) translateY(0); }
+  100% { transform: rotate(4deg) translateY(4px); }
+}
+
+@keyframes dizzySpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Sağ Panel */
 .board-right-panel {
   display: flex;
@@ -1244,6 +1494,13 @@ body {
     width: 100%;
     padding: 6px;
   }
+  .hangman-speech-bubble {
+    top: 4px;
+    right: 8px;
+    max-width: 120px;
+    font-size: 0.72rem;
+    padding: 4px 8px;
+  }
   .svg-container {
     max-width: 160px;
     height: 160px;
@@ -1386,6 +1643,14 @@ body {
 
   .gallows-wrapper {
     padding: 4px;
+  }
+  .hangman-speech-bubble {
+    top: 2px;
+    right: 4px;
+    max-width: 100px;
+    font-size: 0.65rem;
+    padding: 3px 5px;
+    border-width: 2px;
   }
 
   .mistake-counter {

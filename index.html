@@ -162,6 +162,11 @@
 
           <!-- Adam Asmaca Çizim Kutusu (SVG Karikatür Karakter) -->
           <div class="gallows-wrapper">
+            <!-- Komik Konuşma Baloncuğu -->
+            <div id="hangmanBubble" class="hangman-speech-bubble" aria-live="polite">
+              <span id="hangmanBubbleText">Hop!</span>
+            </div>
+
             <div class="mistake-counter">
               Kalan Can: <span id="livesRemainingBadge" class="lives-badge">6 / 6</span>
             </div>
@@ -173,55 +178,144 @@
                 <path class="gallow-part" d="M 60 260 L 60 30" stroke="#795548" stroke-width="8" stroke-linecap="round"/>
                 <path class="gallow-part" d="M 56 30 L 170 30" stroke="#795548" stroke-width="8" stroke-linecap="round"/>
                 <path class="gallow-part" d="M 60 70 L 100 30" stroke="#795548" stroke-width="6" stroke-linecap="round"/>
-                <path class="gallow-part" d="M 170 30 L 170 65" stroke="#FFA000" stroke-width="4" stroke-dasharray="2,2"/>
+                <!-- İp ve Kement Halkası -->
+                <path id="gallowRope" class="gallow-part gallow-rope" d="M 170 30 L 170 65" stroke="#FFA000" stroke-width="4" stroke-dasharray="2,2"/>
+                <circle cx="170" cy="65" r="4" fill="#E65100"/>
 
-                <!-- Sevimli Karakter Parçaları -->
-                <!-- Hata 1: Kafa -->
-                <g id="figureHead" class="figure-part" style="opacity: 0;">
-                  <circle cx="170" cy="90" r="24" fill="#FFE082" stroke="#FF8F00" stroke-width="3"/>
-                  <circle id="eyeLeft" cx="162" cy="86" r="3" fill="#37474F"/>
-                  <circle id="eyeRight" cx="178" cy="86" r="3" fill="#37474F"/>
-                  <circle cx="157" cy="94" r="3" fill="#FF8A80" opacity="0.6"/>
-                  <circle cx="183" cy="94" r="3" fill="#FF8A80" opacity="0.6"/>
-                  <path id="mouthNormal" d="M 163 96 Q 170 103 177 96" stroke="#37474F" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                  <g id="eyesDead" style="display: none;">
-                    <line x1="158" y1="83" x2="166" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="166" y1="83" x2="158" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="174" y1="83" x2="182" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="182" y1="83" x2="174" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                <!-- Komik ve Eğlenceli Karakter (Tıklanabilir İnteraktif Maskot) -->
+                <g id="hangmanCharacter" class="hangman-character" style="transform-origin: 170px 30px;">
+                  
+                  <!-- Hata 1: Kafa & Sevimli İfadeler & Pervaneli Şapka -->
+                  <g id="figureHead" class="figure-part head-group" style="opacity: 0;">
+                    <!-- Pervaneli Komik Şapka -->
+                    <g id="figureHat" class="figure-hat" style="transform-origin: 170px 74px;">
+                      <path d="M 152 74 Q 170 58 188 74 Z" fill="#FF5722" stroke="#E64A19" stroke-width="1.5"/>
+                      <ellipse cx="170" cy="74" rx="19" ry="3.5" fill="#FFC107"/>
+                      <line x1="170" y1="62" x2="170" y2="55" stroke="#37474F" stroke-width="2"/>
+                      <!-- Dönen Pervane -->
+                      <g id="hatPropeller" class="hat-propeller" style="transform-origin: 170px 55px;">
+                        <ellipse cx="163" cy="55" rx="7" ry="2.2" fill="#4CAF50"/>
+                        <ellipse cx="177" cy="55" rx="7" ry="2.2" fill="#2196F3"/>
+                        <circle cx="170" cy="55" r="2.2" fill="#E91E63"/>
+                      </g>
+                    </g>
+
+                    <!-- Kafa Yuvarlağı -->
+                    <circle id="headBase" cx="170" cy="90" r="24" fill="#FFE082" stroke="#FF8F00" stroke-width="3"/>
+                    
+                    <!-- Sevimli Yanak Allıkları -->
+                    <ellipse cx="155" cy="94" rx="4" ry="2.5" fill="#FF8A80" opacity="0.6"/>
+                    <ellipse cx="185" cy="94" rx="4" ry="2.5" fill="#FF8A80" opacity="0.6"/>
+
+                    <!-- Kaşlar -->
+                    <path id="eyebrowLeft" class="eyebrow" d="M 157 78 Q 162 75 167 78" stroke="#5D4037" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path id="eyebrowRight" class="eyebrow" d="M 173 78 Q 178 75 183 78" stroke="#5D4037" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+                    <!-- Gözler (Beyaz + Gözbebeği) -->
+                    <g id="eyesNormal">
+                      <!-- Göz Akı -->
+                      <circle cx="162" cy="86" r="4.8" fill="#FFFFFF" stroke="#37474F" stroke-width="1"/>
+                      <circle cx="178" cy="86" r="4.8" fill="#FFFFFF" stroke="#37474F" stroke-width="1"/>
+                      <!-- Gözbebekleri (Hareket edebilir) -->
+                      <circle id="eyeLeft" class="eye-pupil" cx="162" cy="86" r="2.8" fill="#263238"/>
+                      <circle id="eyeRight" class="eye-pupil" cx="178" cy="86" r="2.8" fill="#263238"/>
+                      <!-- Işık Parıltısı -->
+                      <circle cx="161" cy="85" r="1.1" fill="#FFFFFF"/>
+                      <circle cx="177" cy="85" r="1.1" fill="#FFFFFF"/>
+                    </g>
+
+                    <!-- Ağız Seçenekleri -->
+                    <!-- 1. Normal Gülümseme -->
+                    <path id="mouthNormal" d="M 163 96 Q 170 103 177 96" stroke="#37474F" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    
+                    <!-- 2. Endişeli / Dalgalı Titreyen Ağız (Hata 2 & 3) -->
+                    <path id="mouthWorried" d="M 162 98 Q 166 94 170 98 Q 174 102 178 98" stroke="#37474F" stroke-width="2.5" fill="none" stroke-linecap="round" style="display: none;"/>
+                    
+                    <!-- 3. Şok / Çığlık Ağzı (Hata 4 & 5) -->
+                    <g id="mouthOpen" style="display: none;">
+                      <ellipse cx="170" cy="99" rx="6" ry="6.5" fill="#C62828"/>
+                      <rect x="167" y="93" width="6" height="3" rx="1" fill="#FFFFFF"/>
+                    </g>
+
+                    <!-- 4. Oyun Bitti / Dil Dışarıda Ağız (Hata 6) -->
+                    <g id="mouthDead" style="display: none;">
+                      <path d="M 164 96 Q 170 92 176 96" stroke="#E53935" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                      <path d="M 167 96 C 167 104 175 104 175 96 Z" fill="#FF5252" stroke="#C62828" stroke-width="1"/>
+                    </g>
+
+                    <!-- 5. Oyun Bitti / Çarpı Gözler (X_X) -->
+                    <g id="eyesDead" style="display: none;">
+                      <line x1="158" y1="82" x2="166" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                      <line x1="166" y1="82" x2="158" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                      <line x1="174" y1="82" x2="182" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                      <line x1="182" y1="82" x2="174" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+
+                    <!-- Panik Ter Damlaları -->
+                    <g id="sweatDrops" class="sweat-drops" style="opacity: 0;">
+                      <path class="sweat-drop s-left" d="M 147 76 C 147 72 143 69 143 69 C 143 69 139 72 139 76 A 4 4 0 0 0 147 76 Z" fill="#00B0FF"/>
+                      <path class="sweat-drop s-right" d="M 197 75 C 197 71 201 68 201 68 C 201 68 205 71 205 75 A 4 4 0 0 1 197 75 Z" fill="#00B0FF"/>
+                    </g>
+
+                    <!-- Sersemlik Yıldızları (Oyun Kaybedildiğinde Döner) -->
+                    <g id="dizzyStars" class="dizzy-stars" style="display: none; transform-origin: 170px 65px;">
+                      <text x="145" y="65" font-size="14">💫</text>
+                      <text x="182" y="62" font-size="14">⭐</text>
+                    </g>
                   </g>
-                  <path id="mouthDead" d="M 164 99 Q 170 93 176 99" stroke="#E53935" stroke-width="3" fill="none" stroke-linecap="round" style="display: none;"/>
-                </g>
 
-                <!-- Hata 2: Gövde -->
-                <g id="figureBody" class="figure-part" style="opacity: 0;">
-                  <line x1="170" y1="114" x2="170" y2="175" stroke="#42A5F5" stroke-width="14" stroke-linecap="round"/>
-                  <circle cx="170" cy="135" r="2.5" fill="#FFF"/>
-                  <circle cx="170" cy="150" r="2.5" fill="#FFF"/>
-                </g>
+                  <!-- Hata 2: Gövde & Çizgili Tişört ve Sevimli Papyon -->
+                  <g id="figureBody" class="figure-part body-group" style="opacity: 0;">
+                    <!-- Tişört Ana Çizgisi -->
+                    <line x1="170" y1="114" x2="170" y2="175" stroke="#42A5F5" stroke-width="16" stroke-linecap="round"/>
+                    <!-- Çizgiler -->
+                    <line x1="164" y1="130" x2="176" y2="130" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="163" y1="145" x2="177" y2="145" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="164" y1="160" x2="176" y2="160" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Pembe Papyon -->
+                    <g id="figureBowtie" class="figure-bowtie">
+                      <polygon points="163,115 177,123 177,115 163,123" fill="#E91E63"/>
+                      <circle cx="170" cy="119" r="2.5" fill="#C2185B"/>
+                    </g>
+                  </g>
 
-                <!-- Hata 3: Sol Kol -->
-                <g id="figureArmLeft" class="figure-part" style="opacity: 0;">
-                  <line x1="170" y1="125" x2="140" y2="155" stroke="#FFE082" stroke-width="6" stroke-linecap="round"/>
-                  <circle cx="138" cy="157" r="4" fill="#FFB300"/>
-                </g>
+                  <!-- Hata 3: Sol Kol & Çizgi Film Eldiveni -->
+                  <g id="figureArmLeft" class="figure-part arm-left-group" style="opacity: 0; transform-origin: 170px 125px;">
+                    <line x1="170" y1="125" x2="138" y2="152" stroke="#FFE082" stroke-width="6" stroke-linecap="round"/>
+                    <!-- Eldiven ve Başparmak -->
+                    <circle cx="136" cy="154" r="5" fill="#FFB300"/>
+                    <circle cx="140" cy="150" r="2.5" fill="#FFB300"/>
+                  </g>
 
-                <!-- Hata 4: Sağ Kol -->
-                <g id="figureArmRight" class="figure-part" style="opacity: 0;">
-                  <line x1="170" y1="125" x2="200" y2="155" stroke="#FFE082" stroke-width="6" stroke-linecap="round"/>
-                  <circle cx="202" cy="157" r="4" fill="#FFB300"/>
-                </g>
+                  <!-- Hata 4: Sağ Kol & Çizgi Film Eldiveni -->
+                  <g id="figureArmRight" class="figure-part arm-right-group" style="opacity: 0; transform-origin: 170px 125px;">
+                    <line x1="170" y1="125" x2="202" y2="152" stroke="#FFE082" stroke-width="6" stroke-linecap="round"/>
+                    <!-- Eldiven ve Başparmak -->
+                    <circle cx="204" cy="154" r="5" fill="#FFB300"/>
+                    <circle cx="200" cy="150" r="2.5" fill="#FFB300"/>
+                  </g>
 
-                <!-- Hata 5: Sol Bacak -->
-                <g id="figureLegLeft" class="figure-part" style="opacity: 0;">
-                  <line x1="170" y1="175" x2="145" y2="225" stroke="#5C6BC0" stroke-width="7" stroke-linecap="round"/>
-                  <ellipse cx="140" cy="227" rx="8" ry="5" fill="#FF7043"/>
-                </g>
+                  <!-- Hata 5: Sol Bacak & Çizgili Çorap & Spor Ayakkabı -->
+                  <g id="figureLegLeft" class="figure-part leg-left-group" style="opacity: 0; transform-origin: 170px 175px;">
+                    <!-- Pantolon / Bacak -->
+                    <line x1="170" y1="175" x2="145" y2="223" stroke="#5C6BC0" stroke-width="7" stroke-linecap="round"/>
+                    <!-- Çorap -->
+                    <line x1="147" y1="214" x2="145" y2="221" stroke="#FFEB3B" stroke-width="7" stroke-linecap="butt"/>
+                    <!-- Spor Ayakkabı -->
+                    <ellipse cx="140" cy="226" rx="9" ry="5.5" fill="#FF5722"/>
+                    <ellipse cx="135" cy="227" rx="3.5" ry="3.5" fill="#FFFFFF"/>
+                  </g>
 
-                <!-- Hata 6: Sağ Bacak -->
-                <g id="figureLegRight" class="figure-part" style="opacity: 0;">
-                  <line x1="170" y1="175" x2="195" y2="225" stroke="#5C6BC0" stroke-width="7" stroke-linecap="round"/>
-                  <ellipse cx="200" cy="227" rx="8" ry="5" fill="#FF7043"/>
+                  <!-- Hata 6: Sağ Bacak & Çizgili Çorap & Spor Ayakkabı -->
+                  <g id="figureLegRight" class="figure-part leg-right-group" style="opacity: 0; transform-origin: 170px 175px;">
+                    <!-- Pantolon / Bacak -->
+                    <line x1="170" y1="175" x2="195" y2="223" stroke="#5C6BC0" stroke-width="7" stroke-linecap="round"/>
+                    <!-- Çorap -->
+                    <line x1="193" y1="214" x2="195" y2="221" stroke="#FFEB3B" stroke-width="7" stroke-linecap="butt"/>
+                    <!-- Spor Ayakkabı -->
+                    <ellipse cx="200" cy="226" rx="9" ry="5.5" fill="#FF5722"/>
+                    <ellipse cx="205" cy="227" rx="3.5" ry="3.5" fill="#FFFFFF"/>
+                  </g>
                 </g>
               </svg>
             </div>

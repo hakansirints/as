@@ -61,30 +61,54 @@ class SoundEngine {
     this.playTone(659.25, 'triangle', 0.2, 0.08, 0.25); // E5
   }
 
-  // Yanlış harfte sempatik "boing" tonu
-  playWrongLetter() {
+  // Yanlış harfte sempatik ve komik "boing/twang" tonu (Hata sayısına göre değişken ton)
+  playWrongLetter(mistakeNumber = 1) {
     if (!this.enabled) return;
     this.init();
     if (!this.audioCtx) return;
 
     try {
+      const now = this.audioCtx.currentTime;
+      const startFreq = 220 + (mistakeNumber * 35);
+      const endFreq = 85 + (mistakeNumber * 10);
+
       const osc = this.audioCtx.createOscillator();
       const gain = this.audioCtx.createGain();
-      const now = this.audioCtx.currentTime;
 
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(260, now);
-      osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+      osc.frequency.setValueAtTime(startFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.28);
 
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
 
       osc.connect(gain);
       gain.connect(this.audioCtx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.25);
+      osc.stop(now + 0.28);
+
+      // İleri hatalarda komik çizgi film yay (spring) efekti ekle
+      if (mistakeNumber >= 3) {
+        const osc2 = this.audioCtx.createOscillator();
+        const gain2 = this.audioCtx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(450 + mistakeNumber * 50, now + 0.06);
+        osc2.frequency.exponentialRampToValueAtTime(120, now + 0.32);
+        gain2.gain.setValueAtTime(0.18, now + 0.06);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        osc2.connect(gain2);
+        gain2.connect(this.audioCtx.destination);
+        osc2.start(now + 0.06);
+        osc2.stop(now + 0.32);
+      }
     } catch (e) {}
+  }
+
+  // Tıklama / Gıdıklama sesi
+  playTickle() {
+    this.playTone(650, 'sine', 0.08, 0, 0.15);
+    this.playTone(900, 'sine', 0.1, 0.06, 0.18);
   }
 
   // Tahmin yanlış olup oyuncu elendiğinde
@@ -266,12 +290,32 @@ const DOM = {
   openGuessModalBtn: document.getElementById('openGuessModalBtn'),
   endGameEarlyBtn: document.getElementById('endGameEarlyBtn'),
 
-  // Asmaca Karakter Yüz Durumları
+  // Asmaca Karakteri ve Görsel Elementleri
+  hangmanSvg: document.getElementById('hangmanSvg'),
+  hangmanCharacter: document.getElementById('hangmanCharacter'),
+  gallowRope: document.getElementById('gallowRope'),
+  hangmanBubble: document.getElementById('hangmanBubble'),
+  hangmanBubbleText: document.getElementById('hangmanBubbleText'),
+  figureHat: document.getElementById('figureHat'),
+  hatPropeller: document.getElementById('hatPropeller'),
+  figureHead: document.getElementById('figureHead'),
+  figureBody: document.getElementById('figureBody'),
+  figureArmLeft: document.getElementById('figureArmLeft'),
+  figureArmRight: document.getElementById('figureArmRight'),
+  figureLegLeft: document.getElementById('figureLegLeft'),
+  figureLegRight: document.getElementById('figureLegRight'),
+  eyebrowLeft: document.getElementById('eyebrowLeft'),
+  eyebrowRight: document.getElementById('eyebrowRight'),
+  eyesNormal: document.getElementById('eyesNormal'),
   eyesDead: document.getElementById('eyesDead'),
   eyeLeft: document.getElementById('eyeLeft'),
   eyeRight: document.getElementById('eyeRight'),
   mouthNormal: document.getElementById('mouthNormal'),
+  mouthWorried: document.getElementById('mouthWorried'),
+  mouthOpen: document.getElementById('mouthOpen'),
   mouthDead: document.getElementById('mouthDead'),
+  sweatDrops: document.getElementById('sweatDrops'),
+  dizzyStars: document.getElementById('dizzyStars'),
 
   // Kelime Tahmin Modalı
   guessWordModal: document.getElementById('guessWordModal'),
@@ -605,6 +649,7 @@ function handleLetterGuess(letter) {
     // DOĞRU HARF
     if (btn) btn.classList.add('correct');
     sounds.playCorrectLetter();
+    triggerHangmanHappyReaction();
 
     // Kaç adet bulunduğunu hesapla
     let count = 0;
@@ -639,11 +684,13 @@ function handleLetterGuess(letter) {
   } else {
     // YANLIŞ HARF
     if (btn) btn.classList.add('wrong');
-    sounds.playWrongLetter();
 
     gameState.mistakes++;
     drawHangmanPart(gameState.mistakes);
     DOM.livesRemainingBadge.textContent = `${gameState.maxMistakes - gameState.mistakes} / ${gameState.maxMistakes}`;
+
+    sounds.playWrongLetter(gameState.mistakes);
+    triggerHangmanMistakeReaction(gameState.mistakes);
 
     showToast(`❌ "${letter}" harfi kelimede yok!`);
 
@@ -731,6 +778,7 @@ DOM.submitFullWordGuessBtn.addEventListener('click', () => {
     // 6. KURAL: Tahmin hakkını kullanıp bilemeyen kişi o turdan ELENİR!
     currentGuesser.isEliminatedThisRound = true;
     sounds.playEliminated();
+    triggerHangmanGaspReaction(currentGuesser.name);
     showToast(`💥 ${currentGuesser.name} yanlış tahmin etti ("${guess}") ve bu tur elendi!`, 3500);
 
     updateScoreboardUI();
@@ -749,8 +797,265 @@ DOM.submitFullWordGuessBtn.addEventListener('click', () => {
 });
 
 // ==========================================
-// 12. ADAM ASMACA SVG ÇİZİM YÖNETİMİ
+// 12. KOMİK ASILAN ADAM TEPKİLERİ VE ANİMASYONLARI
 // ==========================================
+
+const HANGMAN_QUOTES = {
+  mistake1: [
+    "Ayy! İlk hatada beni mi çağırdınız?! 😅",
+    "Merhaba! Lütfen nazik olun, ben daha çok yeniyim! 🎩",
+    "Hop! Dikkatli seçin, burası biraz rüzgarlı! 🧐",
+    "Kafam çıktı piyasaya, aman dikkat! 🎪"
+  ],
+  mistake2: [
+    "Hop noluyo?! Gömleğim kırıştı yahu! 👔",
+    "Karnım guruldadı, bari bir sesli harf bilin! 🙈",
+    "Bir ürperti geldi... Lütfen yanlış basmayın! 🥶",
+    "Gövdem geldi ama kalbim pır pır ediyor! 💓"
+  ],
+  mistake3: [
+    "İmdat! Sol kolum havada kaldı! 🙋‍♂️",
+    "Harflere dikkat! Koluma kramp girecek! 😱",
+    "Bu harf hiç olmadı ama yaa! 🤦‍♂️",
+    "Sol kolumla el sallıyorum: Kurtarın beni! 🚩"
+  ],
+  mistake4: [
+    "Bari iki kolumu birden bağlamasaydınız! 👐",
+    "Annemi istiyorum! Yanlış basmayın artık! 📢",
+    "Kollarımla alkışlayamıyorum bile yahu! 🥺",
+    "Eyvah eyvah, iki kolum da havalarda! 🤷‍♂️"
+  ],
+  mistake5: [
+    "Tir tir titriyorum! Tek bir canım kaldı! 🚨🦵",
+    "Ayaklarım yerden kesildi, nefes alamıyorum! 😱",
+    "Son şansınız! Lütfen kelimeyi kurtarın! 🆘",
+    "Bacaklarım zangır zangır titriyor, bir harf daha bitti! ⚡"
+  ],
+  mistake6: [
+    "Gözlerim fırıldak oldu! Yıldızları sayıyorum... ⭐💫",
+    "Ben dedim o harf değil diye! Ruhum uçtu... 👻",
+    "Olamazzz! Helvam fıstıklı olsun bari! 🍯😵",
+    "Asıldım gittim! Görüşürüz öbür dünyada! 🎪😵"
+  ],
+  correct: [
+    "Oh be! Rahat bir nefes aldım! 🥳",
+    "Harikasın! Böyle devam et! 🌟",
+    "Süper harf! Kurtuluyorum galiba! 🎈",
+    "Helal olsun, işte beklediğim harf! 👏",
+    "Kalbim ferahladı, yaşasın! 💖"
+  ],
+  gasp: [
+    "Aman tanrım! O kelime hiç olmadı! 😱",
+    "Eyvah, büyük risk aldın ve elendin! 💥",
+    "Cesurcaydı ama maalesef yanlış! 🙈"
+  ],
+  tickle: [
+    "Hehe gıdıklama beni! 😂",
+    "Hey dokunma oraya, çok huylanıyorum! 😜",
+    "Dur dur güldürme, harflere odaklanın! 😆",
+    "Beni bırak da kelimeyi tahmin et! 🎈",
+    "Gıdık gıdık! Haha yapma! 🪶"
+  ]
+};
+
+let hangmanSpeechTimer = null;
+let hangmanReactionTimer = null;
+
+function triggerHangmanSpeech(text, duration = 2800) {
+  if (!DOM.hangmanBubble || !DOM.hangmanBubbleText) return;
+
+  if (hangmanSpeechTimer) {
+    clearTimeout(hangmanSpeechTimer);
+    hangmanSpeechTimer = null;
+  }
+
+  DOM.hangmanBubbleText.textContent = text;
+  DOM.hangmanBubble.classList.remove('active');
+  void DOM.hangmanBubble.offsetWidth; // Reflow tetikle
+  DOM.hangmanBubble.classList.add('active');
+
+  hangmanSpeechTimer = setTimeout(() => {
+    if (DOM.hangmanBubble) DOM.hangmanBubble.classList.remove('active');
+  }, duration);
+}
+
+function clearHangmanReactionClasses() {
+  if (!DOM.hangmanCharacter) return;
+  DOM.hangmanCharacter.classList.remove('react-shock', 'react-severe', 'react-happy', 'react-tickle', 'dead-slump');
+  if (DOM.figureHead) DOM.figureHead.classList.remove('panicking');
+  if (DOM.figureArmLeft) DOM.figureArmLeft.classList.remove('flailing');
+  if (DOM.figureArmRight) DOM.figureArmRight.classList.remove('flailing');
+  if (DOM.figureLegLeft) DOM.figureLegLeft.classList.remove('kicking');
+  if (DOM.figureLegRight) DOM.figureLegRight.classList.remove('kicking');
+  if (DOM.hatPropeller) DOM.hatPropeller.classList.remove('fast-spin');
+  if (DOM.sweatDrops) DOM.sweatDrops.classList.remove('active');
+  if (DOM.gallowRope) DOM.gallowRope.classList.remove('springing');
+}
+
+function triggerHangmanMistakeReaction(mistakeCount) {
+  if (!DOM.hangmanCharacter) return;
+
+  clearHangmanReactionClasses();
+  if (hangmanReactionTimer) clearTimeout(hangmanReactionTimer);
+
+  void DOM.hangmanCharacter.offsetWidth; // Reflow
+
+  // Karakterin hata aşamasına göre yüz ifadesini ve uzuv tepkilerini güncelle
+  if (mistakeCount === 1) {
+    if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'block';
+    if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+    if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'none';
+    if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+    if (DOM.eyesNormal) DOM.eyesNormal.style.display = 'block';
+    if (DOM.eyesDead) DOM.eyesDead.style.display = 'none';
+
+    DOM.hangmanCharacter.classList.add('react-shock');
+    if (DOM.figureHead) DOM.figureHead.classList.add('panicking');
+    if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+    if (DOM.gallowRope) DOM.gallowRope.classList.add('springing');
+  } else if (mistakeCount === 2) {
+    if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'none';
+    if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'block';
+    if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'none';
+    if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+
+    DOM.hangmanCharacter.classList.add('react-shock');
+    if (DOM.figureHead) DOM.figureHead.classList.add('panicking');
+    if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+    if (DOM.gallowRope) DOM.gallowRope.classList.add('springing');
+  } else if (mistakeCount === 3) {
+    if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'none';
+    if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'block';
+    if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'none';
+    if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+
+    DOM.hangmanCharacter.classList.add('react-shock');
+    if (DOM.figureHead) DOM.figureHead.classList.add('panicking');
+    if (DOM.figureArmLeft) DOM.figureArmLeft.classList.add('flailing');
+    if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+    if (DOM.gallowRope) DOM.gallowRope.classList.add('springing');
+  } else if (mistakeCount === 4) {
+    if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'none';
+    if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+    if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'block';
+    if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+
+    DOM.hangmanCharacter.classList.add('react-shock');
+    if (DOM.figureHead) DOM.figureHead.classList.add('panicking');
+    if (DOM.figureArmLeft) DOM.figureArmLeft.classList.add('flailing');
+    if (DOM.figureArmRight) DOM.figureArmRight.classList.add('flailing');
+    if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+    if (DOM.gallowRope) DOM.gallowRope.classList.add('springing');
+  } else if (mistakeCount === 5) {
+    // Büyük Panik! 5. Hata
+    if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'none';
+    if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+    if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'block';
+    if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+
+    DOM.hangmanCharacter.classList.add('react-severe');
+    if (DOM.figureHead) DOM.figureHead.classList.add('panicking');
+    if (DOM.figureArmLeft) DOM.figureArmLeft.classList.add('flailing');
+    if (DOM.figureArmRight) DOM.figureArmRight.classList.add('flailing');
+    if (DOM.figureLegLeft) DOM.figureLegLeft.classList.add('kicking');
+    if (DOM.sweatDrops) DOM.sweatDrops.classList.add('active');
+    if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+    if (DOM.gallowRope) DOM.gallowRope.classList.add('springing');
+  } else if (mistakeCount >= 6) {
+    // 6. Hata: Adam Asıldı
+    setHangmanDeadFace();
+    DOM.hangmanCharacter.classList.add('dead-slump');
+    if (DOM.figureArmLeft) DOM.figureArmLeft.classList.remove('flailing');
+    if (DOM.figureArmRight) DOM.figureArmRight.classList.remove('flailing');
+    if (DOM.figureLegLeft) DOM.figureLegLeft.classList.remove('kicking');
+    if (DOM.figureLegRight) DOM.figureLegRight.classList.remove('kicking');
+    if (DOM.figureHead) DOM.figureHead.classList.remove('panicking');
+    if (DOM.hatPropeller) DOM.hatPropeller.classList.remove('fast-spin');
+    if (DOM.dizzyStars) {
+      DOM.dizzyStars.style.display = 'block';
+      DOM.dizzyStars.classList.add('spinning');
+    }
+  }
+
+  // Rastgele komik replik seç
+  const quoteKey = `mistake${Math.min(mistakeCount, 6)}`;
+  const quotesList = HANGMAN_QUOTES[quoteKey] || HANGMAN_QUOTES.mistake1;
+  const quote = quotesList[Math.floor(Math.random() * quotesList.length)];
+  triggerHangmanSpeech(quote, 3000);
+
+  // Animasyon süresi bitince sakinleş (eğer henüz asılmadıysa)
+  if (mistakeCount < 6) {
+    hangmanReactionTimer = setTimeout(() => {
+      clearHangmanReactionClasses();
+    }, 1300);
+  }
+}
+
+function triggerHangmanHappyReaction() {
+  if (!DOM.hangmanCharacter) return;
+  clearHangmanReactionClasses();
+  if (hangmanReactionTimer) clearTimeout(hangmanReactionTimer);
+
+  void DOM.hangmanCharacter.offsetWidth;
+  DOM.hangmanCharacter.classList.add('react-happy');
+  if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+
+  // Yüzü sevimli gülümsemeye al
+  if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'block';
+  if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+  if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'none';
+  if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+
+  const quotes = HANGMAN_QUOTES.correct;
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  triggerHangmanSpeech(quote, 2400);
+
+  hangmanReactionTimer = setTimeout(() => {
+    clearHangmanReactionClasses();
+  }, 1000);
+}
+
+function triggerHangmanTickleReaction() {
+  if (!DOM.hangmanCharacter) return;
+  sounds.playTickle();
+  clearHangmanReactionClasses();
+  if (hangmanReactionTimer) clearTimeout(hangmanReactionTimer);
+
+  void DOM.hangmanCharacter.offsetWidth;
+  DOM.hangmanCharacter.classList.add('react-tickle');
+  if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
+
+  const quotes = HANGMAN_QUOTES.tickle;
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  triggerHangmanSpeech(quote, 2200);
+
+  hangmanReactionTimer = setTimeout(() => {
+    clearHangmanReactionClasses();
+  }, 700);
+}
+
+function triggerHangmanGaspReaction(playerName) {
+  if (!DOM.hangmanCharacter) return;
+  clearHangmanReactionClasses();
+  if (hangmanReactionTimer) clearTimeout(hangmanReactionTimer);
+
+  void DOM.hangmanCharacter.offsetWidth;
+  DOM.hangmanCharacter.classList.add('react-severe');
+  if (DOM.mouthOpen) {
+    if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'none';
+    if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+    DOM.mouthOpen.style.display = 'block';
+  }
+
+  const quotes = HANGMAN_QUOTES.gasp;
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  triggerHangmanSpeech(`😱 ${playerName}: ${quote}`, 3200);
+
+  hangmanReactionTimer = setTimeout(() => {
+    clearHangmanReactionClasses();
+  }, 1300);
+}
+
 function resetHangmanSvg() {
   HANGMAN_PARTS.forEach(partId => {
     const el = document.getElementById(partId);
@@ -759,12 +1064,27 @@ function resetHangmanSvg() {
 
   DOM.livesRemainingBadge.textContent = `${gameState.maxMistakes} / ${gameState.maxMistakes}`;
 
-  // Yüz ifadesini normale döndür
-  DOM.eyesDead.style.display = 'none';
-  DOM.mouthDead.style.display = 'none';
-  DOM.eyeLeft.style.display = 'block';
-  DOM.eyeRight.style.display = 'block';
-  DOM.mouthNormal.style.display = 'block';
+  clearHangmanReactionClasses();
+  if (hangmanSpeechTimer) {
+    clearTimeout(hangmanSpeechTimer);
+    hangmanSpeechTimer = null;
+  }
+  if (DOM.hangmanBubble) DOM.hangmanBubble.classList.remove('active');
+
+  // Yüz ifadesini ve durumları normale döndür
+  if (DOM.eyesDead) DOM.eyesDead.style.display = 'none';
+  if (DOM.eyesNormal) DOM.eyesNormal.style.display = 'block';
+  if (DOM.eyeLeft) DOM.eyeLeft.style.display = 'block';
+  if (DOM.eyeRight) DOM.eyeRight.style.display = 'block';
+  if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'block';
+  if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+  if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'none';
+  if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
+  if (DOM.dizzyStars) {
+    DOM.dizzyStars.style.display = 'none';
+    DOM.dizzyStars.classList.remove('spinning');
+  }
+  if (DOM.sweatDrops) DOM.sweatDrops.classList.remove('active');
 }
 
 function drawHangmanPart(mistakeNumber) {
@@ -776,11 +1096,16 @@ function drawHangmanPart(mistakeNumber) {
 }
 
 function setHangmanDeadFace() {
-  DOM.eyesDead.style.display = 'block';
-  DOM.mouthDead.style.display = 'block';
-  DOM.eyeLeft.style.display = 'none';
-  DOM.eyeRight.style.display = 'none';
-  DOM.mouthNormal.style.display = 'none';
+  if (DOM.eyesDead) DOM.eyesDead.style.display = 'block';
+  if (DOM.eyesNormal) DOM.eyesNormal.style.display = 'none';
+  if (DOM.mouthDead) DOM.mouthDead.style.display = 'block';
+  if (DOM.mouthNormal) DOM.mouthNormal.style.display = 'none';
+  if (DOM.mouthWorried) DOM.mouthWorried.style.display = 'none';
+  if (DOM.mouthOpen) DOM.mouthOpen.style.display = 'none';
+  if (DOM.dizzyStars) {
+    DOM.dizzyStars.style.display = 'block';
+    DOM.dizzyStars.classList.add('spinning');
+  }
 }
 
 // ==========================================
@@ -1038,9 +1363,19 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Asılan Adam Maskotuna Tıklayınca Gıdıklama / Komik Tepki
+if (DOM.hangmanCharacter) {
+  DOM.hangmanCharacter.addEventListener('click', () => {
+    if (gameState.isRoundActive) {
+      triggerHangmanTickleReaction();
+    }
+  });
+}
+
 // ==========================================
 // 16. İLK BAŞLATMA
 // ==========================================
 renderPlayerInputs();
 checkOrientationTip();
+
 
