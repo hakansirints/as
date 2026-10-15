@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ff5e7e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Neşeli Adam Asmaca 🎈 | Çok Oyunculu Kelime Oyunu</title>
+  <!-- Google Fonts: Çocuk dostu sevimli yazı tipleri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Grandstander:wght@600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Arka plan hareketli sevimli süslemeler -->
+  <div class="bg-decorations" aria-hidden="true">
+    <span class="floating-balloon b1">🎈</span>
+    <span class="floating-balloon b2">⭐</span>
+    <span class="floating-balloon b3">☁️</span>
+    <span class="floating-balloon b4">✨</span>
+    <span class="floating-balloon b5">🍭</span>
+    <span class="floating-balloon b6">🎨</span>
+  </div>
+
+  <!-- Üst Kısayol Butonları (Tam Ekran & Ses) -->
+  <div class="top-floating-actions">
+    <button id="fullscreenToggleBtn" class="floating-action-btn" title="Tam Ekran Yap / Çık" aria-label="Tam Ekran">
+      <span id="fullscreenIcon">⛶</span>
+    </button>
+    <button id="soundToggleBtn" class="floating-action-btn" title="Sesi Aç / Kapat" aria-label="Sesi Aç veya Kapat">
+      <span id="soundIcon">🔊</span>
+    </button>
+  </div>
+
+  <!-- Mobil Dikey Ekranda Yatay Önerisi -->
+  <div id="rotateDeviceTip" class="rotate-device-tip" aria-live="polite">
+    <span>📱 Daha rahat oynamak için cihazını yan çevirebilirsin! 🔄</span>
+    <button id="closeRotateTipBtn" class="close-tip-btn">&times;</button>
+  </div>
+
+  <div class="app-container">
+    <!-- Üst Başlık -->
+    <header class="game-header">
+      <h1 class="logo-title">
+        <span class="letter-badge bounce-1">A</span>
+        <span class="letter-badge bounce-2">D</span>
+        <span class="letter-badge bounce-3">A</span>
+        <span class="letter-badge bounce-4">M</span>
+        <span class="title-space"></span>
+        <span class="letter-badge bounce-5">A</span>
+        <span class="letter-badge bounce-1">S</span>
+        <span class="letter-badge bounce-2">M</span>
+        <span class="letter-badge bounce-3">A</span>
+        <span class="letter-badge bounce-4">C</span>
+        <span class="letter-badge bounce-5">A</span>
+      </h1>
+      <p class="subtitle">Arkadaşlarınla oyna, kelimeleri bul, puanları topla! 🎉</p>
+    </header>
+
+    <!-- EKRAN 1: Giriş ve Oyuncu Ayarları Ekranı -->
+    <section id="setupScreen" class="screen-card active">
+      <div class="card-inner">
+        <div class="welcome-banner">
+          <div class="mascot-icon">🎪</div>
+          <h2>Oyuna Hoş Geldiniz!</h2>
+          <p>Kaç kişi oynayacaksınız?</p>
+        </div>
+
+        <!-- Oyuncu Sayısı Seçimi -->
+        <div class="player-count-selector">
+          <button type="button" class="count-btn" data-count="2">
+            <span class="count-num">2</span>
+            <span class="count-label">Kişi 👬</span>
+          </button>
+          <button type="button" class="count-btn active" data-count="3">
+            <span class="count-num">3</span>
+            <span class="count-label">Kişi 👨‍👧‍👦</span>
+          </button>
+          <button type="button" class="count-btn" data-count="4">
+            <span class="count-num">4</span>
+            <span class="count-label">Kişi 👨‍👩‍👧‍👦</span>
+          </button>
+        </div>
+
+        <!-- Oyuncu İsimleri Giriş Formu -->
+        <div class="player-names-container">
+          <h3>Oyuncu İsimlerini Girin 👇</h3>
+          <div id="playerInputsList" class="player-inputs-grid">
+            <!-- Dinamik olarak JS ile doldurulacak -->
+          </div>
+        </div>
+
+        <!-- Başla Butonu -->
+        <button id="startSetupBtn" class="primary-fun-btn pulse-glow">
+          <span>Hadi Başlayalım! 🚀</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- EKRAN 2: Gizli Kelime Belirleme Ekranı (Word Master Screen) -->
+    <section id="secretWordScreen" class="screen-card">
+      <div class="card-inner">
+        <div class="secret-step-card">
+          <div class="lock-icon">🤫🔒</div>
+          <div class="secret-role-badge">
+            <span class="badge-role">KELİMEYİ BELİRLEYEN OYUNCU</span>
+            <h2 id="wordMasterNameDisplay">Ali</h2>
+          </div>
+
+          <div class="privacy-warning-box">
+            <p><strong>⚠️ DİKKAT!</strong> Diğer oyuncular lütfen arkanıza dönün veya gözlerinizi kapatın!</p>
+          </div>
+
+          <div class="secret-form-layout">
+            <div class="word-input-group">
+              <label for="secretWordInput">Gizli Kelimeni Gir:</label>
+              <div class="input-with-button">
+                <input type="password" id="secretWordInput" placeholder="Örn: KAPLUMBAĞA" autocomplete="off" maxlength="25">
+                <button type="button" id="toggleWordVisibilityBtn" class="secondary-mini-btn" title="Kelimeyi Göster/Gizle">👁️</button>
+              </div>
+              <span class="input-hint">Yalnızca Türkçe harfler kullanabilirsiniz.</span>
+            </div>
+
+            <div class="hint-input-group">
+              <label for="secretWordHint">İpucu / Kategori (İsteğe Bağlı):</label>
+              <div class="category-quick-pills">
+                <button type="button" class="pill-btn" data-cat="Hayvanlar 🦁">🦁 Hayvan</button>
+                <button type="button" class="pill-btn" data-cat="Meyve & Sebze 🍎">🍎 Meyve</button>
+                <button type="button" class="pill-btn" data-cat="Eşya & Alet 🪑">🪑 Eşya</button>
+                <button type="button" class="pill-btn" data-cat="Şehirler 🌍">🌍 Şehir</button>
+                <button type="button" class="pill-btn" data-cat="Meslekler 👨‍🍳">👨‍🍳 Meslek</button>
+              </div>
+              <input type="text" id="secretWordHint" placeholder="Örn: Bir orman hayvanı" maxlength="40">
+            </div>
+          </div>
+
+          <button id="confirmWordBtn" class="primary-fun-btn">
+            <span>Kelimeyi Kilitle ve Oyunu Başlat 🔒🎮</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EKRAN 3: Ana Oyun Ekranı (Tablet ve Mobil Yatay Optimize) -->
+    <section id="gameBoardScreen" class="screen-card">
+      <div class="game-board-grid-layout">
+        <!-- SOL PANEL: Darağacı, Tur Sayacı, Kalan Can ve Oynatan Bilgisi -->
+        <aside class="board-left-panel">
+          <div class="game-top-bar">
+            <div class="round-badge">
+              <span class="badge-icon">🎯</span>
+              <span>Tur <strong id="currentRoundNumber">1</strong></span>
+            </div>
+            <div class="master-indicator">
+              <span>Kelimeyi Tutan:</span>
+              <span id="currentMasterTag" class="master-tag">👑 Zeynep</span>
+            </div>
+            <button id="endGameEarlyBtn" class="text-mini-btn" title="Oyunu Bitir">🏁 Skor Tablosu</button>
+          </div>
+
+          <!-- Adam Asmaca Çizim Kutusu (SVG Karikatür Karakter) -->
+          <div class="gallows-wrapper">
+            <div class="mistake-counter">
+              Kalan Can: <span id="livesRemainingBadge" class="lives-badge">6 / 6</span>
+            </div>
+
+            <div class="svg-container">
+              <svg id="hangmanSvg" viewBox="0 0 240 280" width="100%" height="100%">
+                <!-- Darağacı Parçaları -->
+                <path class="gallow-part" d="M 20 260 L 120 260" stroke="#795548" stroke-width="8" stroke-linecap="round"/>
+                <path class="gallow-part" d="M 60 260 L 60 30" stroke="#795548" stroke-width="8" stroke-linecap="round"/>
+                <path class="gallow-part" d="M 56 30 L 170 30" stroke="#795548" stroke-width="8" stroke-linecap="round"/>
+                <path class="gallow-part" d="M 60 70 L 100 30" stroke="#795548" stroke-width="6" stroke-linecap="round"/>
+                <path class="gallow-part" d="M 170 30 L 170 65" stroke="#FFA000" stroke-width="4" stroke-dasharray="2,2"/>
+
+                <!-- Sevimli Karakter Parçaları -->
+                <!-- Hata 1: Kafa -->
+                <g id="figureHead" class="figure-part" style="opacity: 0;">
+                  <circle cx="170" cy="90" r="24" fill="#FFE082" stroke="#FF8F00" stroke-width="3"/>
+                  <circle id="eyeLeft" cx="162" cy="86" r="3" fill="#37474F"/>
+                  <circle id="eyeRight" cx="178" cy="86" r="3" fill="#37474F"/>
+                  <circle cx="157" cy="94" r="3" fill="#FF8A80" opacity="0.6"/>
+                  <circle cx="183" cy="94" r="3" fill="#FF8A80" opacity="0.6"/>
+                  <path id="mouthNormal" d="M 163 96 Q 170 103 177 96" stroke="#37474F" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <g id="eyesDead" style="display: none;">
+                    <line x1="158" y1="83" x2="166" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="166" y1="83" x2="158" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="174" y1="83" x2="182" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="182" y1="83" x2="174" y2="90" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+                  </g>
+                  <path id="mouthDead" d="M 164 99 Q 170 93 176 99" stroke="#E53935" stroke-width="3" fill="none" stroke-linecap="round" style="display: none;"/>
+                </g>
+
+                <!-- Hata 2: Gövde -->
+                <g id="figureBody" class="figure-part" style="opacity: 0;">
+                  <line x1="170" y1="114" x2="170" y2="175" stroke="#42A5F5" stroke-width="14" stroke-linecap="round"/>
+                  <circle cx="170" cy="135" r="2.5" fill="#FFF"/>
+                  <circle cx="170" cy="150" r="2.5" fill="#FFF"/>
+                </g>
+
+                <!-- Hata 3: Sol Kol -->
+                <g id="figureArmLeft" class="figure-part" style="opacity: 0;">
+                  <line x1="170" y1="125" x2="140" y2="155" stroke="#FFE082" stroke-width="6" stroke-linecap="round"/>
+                  <circle cx="138" cy="157" r="4" fill="#FFB300"/>
+                </g>
+
+                <!-- Hata 4: Sağ Kol -->
+                <g id="figureArmRight" class="figure-part" style="opacity: 0;">
+                  <line x1="170" y1="125" x2="200" y2="155" stroke="#FFE082" stroke-width="6" stroke-linecap="round"/>
+                  <circle cx="202" cy="157" r="4" fill="#FFB300"/>
+                </g>
+
+                <!-- Hata 5: Sol Bacak -->
+                <g id="figureLegLeft" class="figure-part" style="opacity: 0;">
+                  <line x1="170" y1="175" x2="145" y2="225" stroke="#5C6BC0" stroke-width="7" stroke-linecap="round"/>
+                  <ellipse cx="140" cy="227" rx="8" ry="5" fill="#FF7043"/>
+                </g>
+
+                <!-- Hata 6: Sağ Bacak -->
+                <g id="figureLegRight" class="figure-part" style="opacity: 0;">
+                  <line x1="170" y1="175" x2="195" y2="225" stroke="#5C6BC0" stroke-width="7" stroke-linecap="round"/>
+                  <ellipse cx="200" cy="227" rx="8" ry="5" fill="#FF7043"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </aside>
+
+        <!-- SAĞ PANEL: Oyuncu Şeridi, Duyurular, Kelime Kutuları, Tahmin Butonu, Sanal Klavye -->
+        <main class="board-right-panel">
+          <!-- Oyuncular Skor Tablosu & Sıra Göstergesi -->
+          <div class="players-turn-strip">
+            <div id="playersStatusList" class="players-status-list"></div>
+          </div>
+
+          <!-- Sıradaki Tahminci Duyuru Kutusu -->
+          <div id="turnAnnouncementBox" class="turn-announcement-box">
+            <span class="turn-avatar" id="activeGuesserAvatar">🦊</span>
+            <span class="turn-text">Sıradaki Tahminci: <strong id="activeGuesserName">Can</strong></span>
+            <span class="turn-action-hint">(Bir harf seç veya kelimeyi tahmin et!)</span>
+          </div>
+
+          <!-- Kelime Alanı ve Tahmin Seçenekleri -->
+          <div class="word-section-wrapper">
+            <!-- Kategori / İpucu Rozeti -->
+            <div id="categoryBadgeContainer" class="category-badge">
+              <span class="cat-label">İpucu:</span>
+              <span id="currentCategoryText" class="cat-value">Hayvanlar 🦁</span>
+            </div>
+
+            <!-- Harf Çizgileri / Kutucukları -->
+            <div id="wordLettersContainer" class="word-letters-container"></div>
+
+            <!-- Hızlı Tam Kelime Tahmin Butonu -->
+            <div class="guess-word-action-box">
+              <button id="openGuessModalBtn" class="guess-full-word-btn">
+                <span class="icon">💡</span>
+                <span class="btn-text">Biliyorum! Kelimeyi Tahmin Et (+50 Puan)</span>
+              </button>
+              <p class="guess-risk-note">⚠️ Yanlış tahmin edersen bu tur elenirsin!</p>
+            </div>
+          </div>
+
+          <!-- Sanal Türkçe Klavye -->
+          <div class="keyboard-wrapper">
+            <div id="turkishKeyboard" class="keyboard-grid"></div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- MODAL 1: Kelimeyi Tahmin Etme Modalı -->
+    <div id="guessWordModal" class="modal-backdrop">
+      <div class="modal-card bounce-in">
+        <button id="closeGuessModalBtn" class="modal-close-btn">&times;</button>
+        <div class="modal-header-icon">🤔💭</div>
+        <h3>Tüm Kelimeyi Tahmin Et!</h3>
+        <p class="modal-guesser-note">
+          Tahmin Eden: <strong id="modalGuesserName">Can</strong>
+        </p>
+        <p class="modal-warning">
+          Doğru bilirsen <strong>+50 Puan</strong> kazanırsın!<br>
+          Bilemezsen <strong>bu turdan elenirsin</strong>!
+        </p>
+
+        <div class="modal-input-group">
+          <input type="text" id="fullWordGuessInput" placeholder="Tahmin ettiğin kelimeyi yaz..." autocomplete="off">
+        </div>
+
+        <div class="modal-actions">
+          <button id="submitFullWordGuessBtn" class="primary-fun-btn">
+            <span>Tahminimi Onayla! 🎯</span>
+          </button>
+          <button id="cancelGuessBtn" class="secondary-btn">Vazgeç</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Tur Sonu Özet Modalı -->
+    <div id="roundEndModal" class="modal-backdrop">
+      <div class="modal-card celebration-card bounce-in">
+        <div id="roundEndIcon" class="modal-header-icon">🏆</div>
+        <h2 id="roundEndTitle">Tebrikler!</h2>
+        <div id="roundEndMessage" class="round-end-message"></div>
+
+        <div class="secret-revealed-box">
+          <span>Gizli Kelime:</span>
+          <strong id="revealedSecretWord">KAPLUMBAĞA</strong>
+        </div>
+
+        <div class="round-points-breakdown">
+          <h4>Kazanılan Puanlar 🌟</h4>
+          <ul id="pointsEarnedList" class="points-list"></ul>
+        </div>
+
+        <div class="modal-actions">
+          <button id="nextRoundBtn" class="primary-fun-btn">
+            <span>Sonraki Tura Geç! ➡️</span>
+          </button>
+          <button id="viewFinalScoresBtn" class="secondary-btn">Oyunu Bitir & Kürsü</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: Oyun Sonu ve Şampiyonluk Kürsüsü -->
+    <div id="gameOverModal" class="modal-backdrop">
+      <div class="modal-card podium-card bounce-in">
+        <div class="modal-header-icon">👑🎉</div>
+        <h2>Oyun Bitti! Şampiyonlar</h2>
+        <p class="podium-subtitle">Harika bir yarışmaydı, tebrikler!</p>
+
+        <!-- Kürsü Görünümü -->
+        <div id="podiumContainer" class="podium-container"></div>
+
+        <div class="all-scores-summary">
+          <h4>Tüm Oyuncuların Puanları:</h4>
+          <div id="finalScoreTable" class="final-score-list"></div>
+        </div>
+
+        <button id="restartGameBtn" class="primary-fun-btn">
+          <span>Yeniden Oyna! 🔄</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bildirim Baloncuğu (Toast) -->
+    <div id="gameToast" class="game-toast"></div>
+
+    <!-- Havai Fişek / Konfeti Canvası -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
