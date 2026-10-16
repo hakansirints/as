@@ -168,13 +168,14 @@ class SoundEngine {
 const sounds = new SoundEngine();
 
 // ==========================================
-// 1.1. CANLI SESLENDİRME MOTORU (Web Speech API)
+// 1.1. CANLI SESLENDİRME MOTORU (Stüdyo Çocuk Sesi MP3 + Web Speech Fallback)
 // ==========================================
 class SpeechEngine {
   constructor() {
     this.synth = (typeof window !== 'undefined' && 'speechSynthesis' in window) ? window.speechSynthesis : null;
     this.voices = [];
     this.trVoice = null;
+    this.currentAudio = null;
     this.init();
   }
 
@@ -192,11 +193,36 @@ class SpeechEngine {
     this.trVoice = this.voices.find(v => v.lang && (v.lang.startsWith('tr') || v.lang.includes('TR'))) || null;
   }
 
-  speak(text, isBot = false) {
-    if (!this.synth || !gameState.settings.voiceEnabled || !sounds.enabled) return;
+  // Özel stüdyo kayıtlı çocuk sesi (MP3) oynatıcı
+  playAudio(src) {
+    if (!gameState.settings.voiceEnabled || !gameState.settings.soundEnabled || !sounds.enabled) return;
 
     try {
-      this.synth.cancel();
+      this.stop();
+      const audio = new Audio(src);
+      const vol = Math.max(0, Math.min(1, (gameState.settings.volume !== undefined ? gameState.settings.volume : 80) / 100));
+      audio.volume = vol;
+      this.currentAudio = audio;
+      audio.play().catch(e => {
+        console.warn('Audio playback error (user interaction needed or missing file):', e);
+      });
+    } catch (e) {
+      console.warn('SpeechEngine playAudio error:', e);
+    }
+  }
+
+  speak(text, isBot = false, audioSrc = null) {
+    if (!gameState.settings.voiceEnabled || !gameState.settings.soundEnabled || !sounds.enabled) return;
+
+    if (audioSrc) {
+      this.playAudio(audioSrc);
+      return;
+    }
+
+    if (!this.synth) return;
+
+    try {
+      this.stop();
 
       // Emojileri, sembolleri ve ünlemleri sadeleştir
       let clean = text
@@ -213,7 +239,7 @@ class SpeechEngine {
         utterance.voice = this.trVoice;
       }
 
-      const volFactor = gameState.settings.volume / 100;
+      const volFactor = (gameState.settings.volume !== undefined ? gameState.settings.volume : 80) / 100;
       utterance.volume = Math.max(0.1, volFactor);
 
       if (isBot) {
@@ -231,6 +257,13 @@ class SpeechEngine {
   }
 
   stop() {
+    if (this.currentAudio) {
+      try {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+      } catch (e) {}
+      this.currentAudio = null;
+    }
     if (this.synth) {
       try {
         this.synth.cancel();
@@ -1189,10 +1222,13 @@ function handleTurnTimeout() {
   const timeoutQuotes = HANGMAN_QUOTES.timeUp || [
     "Tik tak tik tak! Zaman doldu, sıra geçti! ⏳",
     "Süre bitti arkadaşım, saat tıkır tıkır işliyor! ⏰",
-    "Uyuya kaldınız galiba, kum saati boşaldı! 🏖️"
+    "Uyuya kaldınız galiba, kum saati boşaldı! 🏖️",
+    "Zaman su gibi aktı! Bir dahaki tura daha hızlı ol! 🏃‍♂️💨"
   ];
-  const q = timeoutQuotes[Math.floor(Math.random() * timeoutQuotes.length)];
-  triggerHangmanSpeech(q, 2800);
+  const randIdx = Math.floor(Math.random() * timeoutQuotes.length);
+  const q = timeoutQuotes[randIdx];
+  const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS.timeUp) ? VOICE_TRACKS.timeUp[randIdx] : null;
+  triggerHangmanSpeech(q, 2800, false, audioFile);
 
   advanceTurn();
 }
@@ -1435,16 +1471,18 @@ function performBotGuess() {
     chosenLetter = unrevealedLetters[0];
   }
 
-  // Robot konuşma baloncuğu
+  // Robot konuşma baloncuğu ve sesi
   const quotes = [
     `Bip-bop! Devrelerim "${chosenLetter}" harfini söylüyor! 🤖`,
-    `Analiz tamam! Harfim: "${chosenLetter}"! ⚙️`,
-    `Acaba içinde "${chosenLetter}" var mı? Merak ettim! 🔍`,
+    `Analiz tamam! Sıra benim tahminimde: "${chosenLetter}"! ⚙️`,
+    `Acaba içinde "${chosenLetter}" var mı? Çok merak ettim! 🔍`,
     `Robotik tahminim: "${chosenLetter}"! 🤖⚡`,
-    `Hesaplamalar yapıldı! "${chosenLetter}" harfine basıyorum! 🦾`
+    `Hesaplamalar yapıldı! "${chosenLetter}" tuşuna basıyorum! 🦾`
   ];
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
-  triggerHangmanSpeech(quote, 2200, true);
+  const randIdx = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randIdx];
+  const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS.robot) ? VOICE_TRACKS.robot[randIdx] : null;
+  triggerHangmanSpeech(quote, 2200, true, audioFile);
 
   // Harf tahminini çalıştır
   gameState.isBotExecuting = true;
@@ -1562,12 +1600,16 @@ if (DOM.useHintBtn) {
     sounds.playHintSparkle();
 
     const hintQuotes = HANGMAN_QUOTES.hint || [
-      `Sihirli ipucu geldi! "${hintLetter}" harfi açıldı! ✨`,
-      `Gözlerimi kapattım ve "${hintLetter}" harfini hediye ettim! 🎁`,
-      `Bir ipucu fısıldıyorum: "${hintLetter}"! Hadi bakalım! 🪄`
+      "Sihirli bir kuş kulağıma ipucu fısıldadı! ✨",
+      "Dayanamadım bir harfi hediye ettim, hadi iyisiniz! 🎁",
+      "İşte beklediğiniz kurtarıcı harf parıldadı! 🌟",
+      "Biraz yardımın kimseye zararı olmaz, işte harf! 🪄",
+      "Gözlerimi kapattım ve gizli bir harfi açıverdim! 🪄"
     ];
-    const hq = hintQuotes[Math.floor(Math.random() * hintQuotes.length)];
-    triggerHangmanSpeech(hq, 2800);
+    const randIdx = Math.floor(Math.random() * hintQuotes.length);
+    const hq = hintQuotes[randIdx];
+    const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS.hint) ? VOICE_TRACKS.hint[randIdx] : null;
+    triggerHangmanSpeech(hq, 2800, false, audioFile);
 
     showToast(`✨ İpucu kullanıldı! "${hintLetter}" harfi açıldı!`, 2500);
 
@@ -1693,10 +1735,28 @@ const HANGMAN_QUOTES = {
   ]
 };
 
+// ==========================================
+// 12.1. GERÇEK ÇOCUK SESİ DOSYA HARİTASI
+// ==========================================
+const VOICE_TRACKS = {
+  mistake1: Array.from({ length: 10 }, (_, i) => `audio/hata1_${i + 1}.mp3`),
+  mistake2: Array.from({ length: 10 }, (_, i) => `audio/hata2_${i + 1}.mp3`),
+  mistake3: Array.from({ length: 10 }, (_, i) => `audio/hata3_${i + 1}.mp3`),
+  mistake4: Array.from({ length: 10 }, (_, i) => `audio/hata4_${i + 1}.mp3`),
+  mistake5: Array.from({ length: 10 }, (_, i) => `audio/hata5_${i + 1}.mp3`),
+  mistake6: Array.from({ length: 10 }, (_, i) => `audio/hata6_${i + 1}.mp3`),
+  correct: Array.from({ length: 10 }, (_, i) => `audio/dogru_${i + 1}.mp3`),
+  hint: Array.from({ length: 5 }, (_, i) => `audio/ipucu_${i + 1}.mp3`),
+  timeUp: Array.from({ length: 4 }, (_, i) => `audio/sure_${i + 1}.mp3`),
+  tickle: Array.from({ length: 5 }, (_, i) => `audio/gidik_${i + 1}.mp3`),
+  gasp: Array.from({ length: 4 }, (_, i) => `audio/elenme_${i + 1}.mp3`),
+  robot: Array.from({ length: 5 }, (_, i) => `audio/robot_${i + 1}.mp3`)
+};
+
 let hangmanSpeechTimer = null;
 let hangmanReactionTimer = null;
 
-function triggerHangmanSpeech(text, duration = 2800, isBot = false) {
+function triggerHangmanSpeech(text, duration = 2800, isBot = false, audioSrc = null) {
   if (!DOM.hangmanBubble || !DOM.hangmanBubbleText) return;
 
   if (hangmanSpeechTimer) {
@@ -1709,8 +1769,8 @@ function triggerHangmanSpeech(text, duration = 2800, isBot = false) {
   void DOM.hangmanBubble.offsetWidth; // Reflow tetikle
   DOM.hangmanBubble.classList.add('active');
 
-  // Canlı Türkçe Seslendirme (Web Speech API)
-  speech.speak(text, isBot);
+  // Canlı Türkçe Çocuk Seslendirmesi (Özel Çocuk Sesi MP3 veya Fallback)
+  speech.speak(text, isBot, audioSrc);
 
   hangmanSpeechTimer = setTimeout(() => {
     if (DOM.hangmanBubble) DOM.hangmanBubble.classList.remove('active');
@@ -1815,11 +1875,13 @@ function triggerHangmanMistakeReaction(mistakeCount) {
     }
   }
 
-  // Rastgele komik replik seç
+  // Rastgele komik replik ve çocuk sesi seç
   const quoteKey = `mistake${Math.min(mistakeCount, 6)}`;
   const quotesList = HANGMAN_QUOTES[quoteKey] || HANGMAN_QUOTES.mistake1;
-  const quote = quotesList[Math.floor(Math.random() * quotesList.length)];
-  triggerHangmanSpeech(quote, 3000);
+  const randIdx = Math.floor(Math.random() * quotesList.length);
+  const quote = quotesList[randIdx];
+  const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS[quoteKey]) ? VOICE_TRACKS[quoteKey][randIdx] : null;
+  triggerHangmanSpeech(quote, 3000, false, audioFile);
 
   // Animasyon süresi bitince sakinleş (eğer henüz asılmadıysa)
   if (mistakeCount < 6) {
@@ -1845,8 +1907,10 @@ function triggerHangmanHappyReaction() {
   if (DOM.mouthDead) DOM.mouthDead.style.display = 'none';
 
   const quotes = HANGMAN_QUOTES.correct;
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
-  triggerHangmanSpeech(quote, 2400);
+  const randIdx = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randIdx];
+  const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS.correct) ? VOICE_TRACKS.correct[randIdx] : null;
+  triggerHangmanSpeech(quote, 2400, false, audioFile);
 
   hangmanReactionTimer = setTimeout(() => {
     clearHangmanReactionClasses();
@@ -1864,8 +1928,10 @@ function triggerHangmanTickleReaction() {
   if (DOM.hatPropeller) DOM.hatPropeller.classList.add('fast-spin');
 
   const quotes = HANGMAN_QUOTES.tickle;
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
-  triggerHangmanSpeech(quote, 2200);
+  const randIdx = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randIdx];
+  const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS.tickle) ? VOICE_TRACKS.tickle[randIdx] : null;
+  triggerHangmanSpeech(quote, 2200, false, audioFile);
 
   hangmanReactionTimer = setTimeout(() => {
     clearHangmanReactionClasses();
@@ -1886,8 +1952,10 @@ function triggerHangmanGaspReaction(playerName) {
   }
 
   const quotes = HANGMAN_QUOTES.gasp;
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
-  triggerHangmanSpeech(`😱 ${playerName}: ${quote}`, 3200);
+  const randIdx = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randIdx];
+  const audioFile = (typeof VOICE_TRACKS !== 'undefined' && VOICE_TRACKS.gasp) ? VOICE_TRACKS.gasp[randIdx] : null;
+  triggerHangmanSpeech(`😱 ${playerName}: ${quote}`, 3200, false, audioFile);
 
   hangmanReactionTimer = setTimeout(() => {
     clearHangmanReactionClasses();
