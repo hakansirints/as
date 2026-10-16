@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#ff5e7e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Neşeli Adam Asmaca 🎈 | Çok Oyunculu Kelime Oyunu</title>
+  <title>Aybars 🎈 | Neşeli Kelime Oyunu</title>
   <!-- Google Fonts: Çocuk dostu sevimli yazı tipleri -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,22 +41,17 @@
   </div>
 
   <div class="app-container">
-    <!-- Üst Başlık -->
+    <!-- Üst Başlık: Aybars Logo -->
     <header class="game-header">
       <h1 class="logo-title">
         <span class="letter-badge bounce-1">A</span>
-        <span class="letter-badge bounce-2">D</span>
-        <span class="letter-badge bounce-3">A</span>
-        <span class="letter-badge bounce-4">M</span>
-        <span class="title-space"></span>
-        <span class="letter-badge bounce-5">A</span>
+        <span class="letter-badge bounce-2">Y</span>
+        <span class="letter-badge bounce-3">B</span>
+        <span class="letter-badge bounce-4">A</span>
+        <span class="letter-badge bounce-5">R</span>
         <span class="letter-badge bounce-1">S</span>
-        <span class="letter-badge bounce-2">M</span>
-        <span class="letter-badge bounce-3">A</span>
-        <span class="letter-badge bounce-4">C</span>
-        <span class="letter-badge bounce-5">A</span>
       </h1>
-      <p class="subtitle">Arkadaşlarınla oyna, kelimeleri bul, puanları topla! 🎉</p>
+      <p class="subtitle">İster arkadaşlarınla oyna, ister akıllı robota karşı yarış! 🎉</p>
     </header>
 
     <!-- EKRAN 1: Giriş ve Oyuncu Ayarları Ekranı -->
@@ -65,11 +60,15 @@
         <div class="welcome-banner">
           <div class="mascot-icon">🎪</div>
           <h2>Oyuna Hoş Geldiniz!</h2>
-          <p>Kaç kişi oynayacaksınız?</p>
+          <p>Oyun modunu veya oyuncu sayısını seçin:</p>
         </div>
 
         <!-- Oyuncu Sayısı Seçimi -->
         <div class="player-count-selector">
+          <button type="button" class="count-btn vs-bot-btn" data-count="1">
+            <span class="count-num">🤖</span>
+            <span class="count-label">Robot'a Karşı</span>
+          </button>
           <button type="button" class="count-btn" data-count="2">
             <span class="count-num">2</span>
             <span class="count-label">Kişi 👬</span>
@@ -119,6 +118,14 @@
               <div class="input-with-button">
                 <input type="password" id="secretWordInput" placeholder="Örn: KAPLUMBAĞA" autocomplete="off" maxlength="25">
                 <button type="button" id="toggleWordVisibilityBtn" class="secondary-mini-btn" title="Kelimeyi Göster/Gizle">👁️</button>
+              </div>
+              <div class="secret-word-helpers">
+                <button type="button" id="randomWordSuggestBtn" class="pill-helper-btn" title="Rastgele kelime öner">
+                  <span>🎲 Rastgele Kelime Öner</span>
+                </button>
+                <button type="button" id="letBotPickWordBtn" class="pill-helper-btn bot-pick-btn" style="display: none;" title="Kelimeyi senin yerine Robot belirlesin">
+                  <span>🤖 Kelimeyi Robot Tutsun</span>
+                </button>
               </div>
               <span class="input-hint">Yalnızca Türkçe harfler kullanabilirsiniz.</span>
             </div>

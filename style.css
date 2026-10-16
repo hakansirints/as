@@ -342,14 +342,21 @@ body {
 }
 
 .player-count-selector {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 580px) {
+  .player-count-selector {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 }
 
 .count-btn {
-  flex: 1;
-  max-width: 140px;
+  width: 100%;
   background: #f1f5f9;
   border: 3px solid #cbd5e1;
   border-radius: var(--border-radius-md);
@@ -360,6 +367,25 @@ body {
   align-items: center;
   transition: all 0.2s ease;
   font-family: inherit;
+}
+
+.count-btn.vs-bot-btn {
+  border-color: #cbd5e1;
+}
+
+.count-btn.vs-bot-btn .count-num {
+  font-size: 1.8rem;
+}
+
+.count-btn.vs-bot-btn.active {
+  background: #eef2ff;
+  border-color: #6366f1;
+  box-shadow: 0 6px 0 #4f46e5;
+}
+
+.count-btn.vs-bot-btn.active .count-num,
+.count-btn.vs-bot-btn.active .count-label {
+  color: #4338ca;
 }
 
 .count-btn .count-num {
@@ -450,6 +476,25 @@ body {
 .player-input-row input::placeholder {
   color: #94a3b8;
   font-weight: 400;
+}
+
+.player-input-row input.bot-input {
+  color: #475569;
+  cursor: default;
+  user-select: none;
+}
+
+.vs-bot-hint {
+  background: #eef2ff;
+  border: 2px dashed #818cf8;
+  color: #3730a3;
+  padding: 10px 14px;
+  border-radius: var(--border-radius-md);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 6px;
+  animation: popIn 0.3s ease;
 }
 
 /* ================= Düğmeler ================= */
@@ -634,6 +679,46 @@ body {
 .input-hint {
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+.secret-word-helpers {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.pill-helper-btn {
+  background: #f8fafc;
+  border: 2px dashed #94a3b8;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pill-helper-btn:hover {
+  background: #e2e8f0;
+  border-color: #64748b;
+  transform: translateY(-2px);
+}
+
+.pill-helper-btn.bot-pick-btn {
+  background: #eef2ff;
+  border-color: #818cf8;
+  color: #4338ca;
+}
+
+.pill-helper-btn.bot-pick-btn:hover {
+  background: #e0e7ff;
+  border-color: #6366f1;
 }
 
 .category-quick-pills {

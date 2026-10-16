@@ -236,11 +236,136 @@ const HANGMAN_PARTS = [
 ];
 
 // ==========================================
+// 3.1. ÇOCUK KELİME SÖZLÜĞÜ (Robot & Öneri Sistemi)
+// ==========================================
+const KID_WORDS_DICTIONARY = [
+  // Hayvanlar 🦁
+  { word: 'ASLAN', category: 'Hayvanlar 🦁' },
+  { word: 'KAPLAN', category: 'Hayvanlar 🦁' },
+  { word: 'ZÜRAFA', category: 'Hayvanlar 🦁' },
+  { word: 'MAYMUN', category: 'Hayvanlar 🦁' },
+  { word: 'FİL', category: 'Hayvanlar 🦁' },
+  { word: 'KÖPEK', category: 'Hayvanlar 🦁' },
+  { word: 'KEDİ', category: 'Hayvanlar 🦁' },
+  { word: 'KAPLUMBAĞA', category: 'Hayvanlar 🦁' },
+  { word: 'TAVŞAN', category: 'Hayvanlar 🦁' },
+  { word: 'PENGUEN', category: 'Hayvanlar 🦁' },
+  { word: 'YUNUS', category: 'Hayvanlar 🦁' },
+  { word: 'BALİNA', category: 'Hayvanlar 🦁' },
+  { word: 'PAPAĞAN', category: 'Hayvanlar 🦁' },
+  { word: 'SİNCAP', category: 'Hayvanlar 🦁' },
+  { word: 'TİLKİ', category: 'Hayvanlar 🦁' },
+  { word: 'AYI', category: 'Hayvanlar 🦁' },
+  { word: 'KURBAĞA', category: 'Hayvanlar 🦁' },
+  { word: 'KARTAL', category: 'Hayvanlar 🦁' },
+  { word: 'GEYİK', category: 'Hayvanlar 🦁' },
+  { word: 'KANGURU', category: 'Hayvanlar 🦁' },
+  { word: 'ZEBRA', category: 'Hayvanlar 🦁' },
+  { word: 'KUNDUZ', category: 'Hayvanlar 🦁' },
+  { word: 'KİRPİ', category: 'Hayvanlar 🦁' },
+  { word: 'KOALA', category: 'Hayvanlar 🦁' },
+
+  // Meyveler & Yiyecekler 🍎
+  { word: 'ELMA', category: 'Meyve & Sebze 🍎' },
+  { word: 'ARMUT', category: 'Meyve & Sebze 🍎' },
+  { word: 'ÇİLEK', category: 'Meyve & Sebze 🍎' },
+  { word: 'MUZ', category: 'Meyve & Sebze 🍎' },
+  { word: 'KARPUZ', category: 'Meyve & Sebze 🍎' },
+  { word: 'KAVUN', category: 'Meyve & Sebze 🍎' },
+  { word: 'PORTAKAL', category: 'Meyve & Sebze 🍎' },
+  { word: 'MANDALİNA', category: 'Meyve & Sebze 🍎' },
+  { word: 'KİVİ', category: 'Meyve & Sebze 🍎' },
+  { word: 'ANANAS', category: 'Meyve & Sebze 🍎' },
+  { word: 'KİRAZ', category: 'Meyve & Sebze 🍎' },
+  { word: 'ŞEFTALİ', category: 'Meyve & Sebze 🍎' },
+  { word: 'DONDURMA', category: 'Meyve & Sebze 🍎' },
+  { word: 'PİZZA', category: 'Meyve & Sebze 🍎' },
+  { word: 'MAKARNA', category: 'Meyve & Sebze 🍎' },
+  { word: 'ÇİKOLATA', category: 'Meyve & Sebze 🍎' },
+  { word: 'KURABİYE', category: 'Meyve & Sebze 🍎' },
+  { word: 'LİMON', category: 'Meyve & Sebze 🍎' },
+  { word: 'HAVUÇ', category: 'Meyve & Sebze 🍎' },
+  { word: 'PATATES', category: 'Meyve & Sebze 🍎' },
+
+  // Eşya & Taşıt & Alet 🪑
+  { word: 'ARABA', category: 'Eşya & Alet 🪑' },
+  { word: 'UÇAK', category: 'Eşya & Alet 🪑' },
+  { word: 'GEMİ', category: 'Eşya & Alet 🪑' },
+  { word: 'TREN', category: 'Eşya & Alet 🪑' },
+  { word: 'BİSİKLET', category: 'Eşya & Alet 🪑' },
+  { word: 'HELİKOPTER', category: 'Eşya & Alet 🪑' },
+  { word: 'ROKET', category: 'Eşya & Alet 🪑' },
+  { word: 'TRAKTÖR', category: 'Eşya & Alet 🪑' },
+  { word: 'İTFAİYE', category: 'Eşya & Alet 🪑' },
+  { word: 'AMBULANS', category: 'Eşya & Alet 🪑' },
+  { word: 'DENİZALTI', category: 'Eşya & Alet 🪑' },
+  { word: 'OTOBÜS', category: 'Eşya & Alet 🪑' },
+  { word: 'KAMYON', category: 'Eşya & Alet 🪑' },
+  { word: 'KAYKAY', category: 'Eşya & Alet 🪑' },
+  { word: 'PATEN', category: 'Eşya & Alet 🪑' },
+  { word: 'KALEM', category: 'Eşya & Alet 🪑' },
+  { word: 'DEFTER', category: 'Eşya & Alet 🪑' },
+  { word: 'KİTAP', category: 'Eşya & Alet 🪑' },
+  { word: 'SİLGİ', category: 'Eşya & Alet 🪑' },
+  { word: 'BOYAMA', category: 'Eşya & Alet 🪑' },
+  { word: 'OYUNCAK', category: 'Eşya & Alet 🪑' },
+  { word: 'BALON', category: 'Eşya & Alet 🪑' },
+  { word: 'UÇURTMA', category: 'Eşya & Alet 🪑' },
+  { word: 'BİLGİSAYAR', category: 'Eşya & Alet 🪑' },
+  { word: 'GÖZLÜK', category: 'Eşya & Alet 🪑' },
+  { word: 'SAAT', category: 'Eşya & Alet 🪑' },
+  { word: 'TELEVİZYON', category: 'Eşya & Alet 🪑' },
+  { word: 'GİTAR', category: 'Eşya & Alet 🪑' },
+  { word: 'PİYANO', category: 'Eşya & Alet 🪑' },
+
+  // Şehirler & Doğa 🌍
+  { word: 'İSTANBUL', category: 'Şehirler 🌍' },
+  { word: 'ANKARA', category: 'Şehirler 🌍' },
+  { word: 'İZMİR', category: 'Şehirler 🌍' },
+  { word: 'BURSA', category: 'Şehirler 🌍' },
+  { word: 'ANTALYA', category: 'Şehirler 🌍' },
+  { word: 'TRABZON', category: 'Şehirler 🌍' },
+  { word: 'GÜNEŞ', category: 'Şehirler 🌍' },
+  { word: 'DÜNYA', category: 'Şehirler 🌍' },
+  { word: 'YILDIZ', category: 'Şehirler 🌍' },
+  { word: 'GEZEGEN', category: 'Şehirler 🌍' },
+  { word: 'GÖKKUŞAĞI', category: 'Şehirler 🌍' },
+  { word: 'BULUT', category: 'Şehirler 🌍' },
+  { word: 'YAĞMUR', category: 'Şehirler 🌍' },
+  { word: 'ORMAN', category: 'Şehirler 🌍' },
+  { word: 'DENİZ', category: 'Şehirler 🌍' },
+
+  // Meslekler 👨‍🍳
+  { word: 'DOKTOR', category: 'Meslekler 👨‍🍳' },
+  { word: 'ÖĞRETMEN', category: 'Meslekler 👨‍🍳' },
+  { word: 'ASTRONOT', category: 'Meslekler 👨‍🍳' },
+  { word: 'PİLOT', category: 'Meslekler 👨‍🍳' },
+  { word: 'KAPTAN', category: 'Meslekler 👨‍🍳' },
+  { word: 'AŞÇI', category: 'Meslekler 👨‍🍳' },
+  { word: 'RESSAM', category: 'Meslekler 👨‍🍳' },
+  { word: 'MÜZİSYEN', category: 'Meslekler 👨‍🍳' },
+  { word: 'İTFAİYECİ', category: 'Meslekler 👨‍🍳' },
+  { word: 'POLİS', category: 'Meslekler 👨‍🍳' },
+  { word: 'MÜHENDİS', category: 'Meslekler 👨‍🍳' },
+  { word: 'ÇİFTÇİ', category: 'Meslekler 👨‍🍳' },
+  { word: 'DİŞÇİ', category: 'Meslekler 👨‍🍳' },
+  { word: 'FUTBOLCU', category: 'Meslekler 👨‍🍳' }
+];
+
+function getRandomBotWord() {
+  const index = Math.floor(Math.random() * KID_WORDS_DICTIONARY.length);
+  return KID_WORDS_DICTIONARY[index];
+}
+
+// ==========================================
 // 4. OYUN DURUMU (Game State)
 // ==========================================
 const gameState = {
   playerCount: 3,
-  players: [], // { id, name, avatar, score, isEliminatedThisRound }
+  isVsBot: false,
+  isBotExecuting: false,
+  botThinkingTimer: null,
+  players: [], // { id, name, avatar, score, isEliminatedThisRound, isBot }
   roundNumber: 1,
   wordMasterIndex: 0,
   currentGuesserIndex: 0,
@@ -274,6 +399,8 @@ const DOM = {
   secretWordHint: document.getElementById('secretWordHint'),
   categoryPills: document.querySelectorAll('.pill-btn'),
   confirmWordBtn: document.getElementById('confirmWordBtn'),
+  randomWordSuggestBtn: document.getElementById('randomWordSuggestBtn'),
+  letBotPickWordBtn: document.getElementById('letBotPickWordBtn'),
 
   // Oyun Tahtası
   currentRoundNumber: document.getElementById('currentRoundNumber'),
@@ -385,6 +512,45 @@ function switchScreen(screenKey) {
 // ==========================================
 function renderPlayerInputs() {
   DOM.playerInputsList.innerHTML = '';
+
+  if (gameState.isVsBot) {
+    // 1. Oyuncu: Aybars
+    const rowUser = document.createElement('div');
+    rowUser.className = 'player-input-row';
+    rowUser.innerHTML = `
+      <span class="player-avatar-badge" title="Aslan">🦁</span>
+      <input type="text" id="player_name_0" placeholder="Aybars" maxlength="15" value="Aybars">
+    `;
+    const input0 = rowUser.querySelector('input');
+    input0.addEventListener('focus', () => {
+      if (input0.value === 'Aybars') input0.value = '';
+    });
+    input0.addEventListener('click', () => {
+      if (input0.value === 'Aybars') input0.value = '';
+    });
+    input0.addEventListener('blur', () => {
+      if (input0.value.trim() === '') input0.value = 'Aybars';
+    });
+    DOM.playerInputsList.appendChild(rowUser);
+
+    // 2. Oyuncu: Robot Bilgisayar
+    const rowBot = document.createElement('div');
+    rowBot.className = 'player-input-row';
+    rowBot.innerHTML = `
+      <span class="player-avatar-badge" title="Robot Bilgisayar">🤖</span>
+      <input type="text" id="player_name_1" class="bot-input" value="Robot Bilgisayar 🤖" readonly>
+    `;
+    DOM.playerInputsList.appendChild(rowBot);
+
+    // Bilgilendirme Kutusu
+    const hintBox = document.createElement('div');
+    hintBox.className = 'vs-bot-hint';
+    hintBox.innerHTML = `🤖 <strong>Robot'a Karşı Modu:</strong> Sen ve Robot karşılıklı oynarsınız! İlk kelimeyi Robot tutar, sen tahmin edersin! 🎈`;
+    DOM.playerInputsList.appendChild(hintBox);
+    return;
+  }
+
+  // Çok Oyunculu Mod
   for (let i = 0; i < gameState.playerCount; i++) {
     const avatar = AVATARS[i % AVATARS.length];
     const defaultName = `${i + 1}. Oyuncu`;
@@ -428,7 +594,14 @@ DOM.playerCountBtns.forEach(btn => {
     sounds.playClick();
     DOM.playerCountBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    gameState.playerCount = parseInt(btn.dataset.count, 10);
+    const count = parseInt(btn.dataset.count, 10);
+    if (count === 1) {
+      gameState.isVsBot = true;
+      gameState.playerCount = 1;
+    } else {
+      gameState.isVsBot = false;
+      gameState.playerCount = count;
+    }
     renderPlayerInputs();
   });
 });
@@ -437,6 +610,36 @@ DOM.playerCountBtns.forEach(btn => {
 DOM.startSetupBtn.addEventListener('click', () => {
   sounds.playClick();
   gameState.players = [];
+
+  if (gameState.isVsBot) {
+    const input0 = document.getElementById('player_name_0');
+    let name0 = input0 ? input0.value.trim() : '';
+    if (!name0) name0 = 'Aybars';
+
+    gameState.players.push({
+      id: 0,
+      name: name0,
+      avatar: '🦁',
+      score: 0,
+      isEliminatedThisRound: false,
+      isBot: false
+    });
+
+    gameState.players.push({
+      id: 1,
+      name: 'Robot Bilgisayar 🤖',
+      avatar: '🤖',
+      score: 0,
+      isEliminatedThisRound: false,
+      isBot: true
+    });
+
+    // 1. Turda kelimeyi Robot tutsun ki Aybars doğrudan oynamaya başlasın!
+    gameState.wordMasterIndex = 1;
+    gameState.roundNumber = 1;
+    setupSecretWordRound();
+    return;
+  }
 
   for (let i = 0; i < gameState.playerCount; i++) {
     const input = document.getElementById(`player_name_${i}`);
@@ -448,7 +651,8 @@ DOM.startSetupBtn.addEventListener('click', () => {
       name: name,
       avatar: AVATARS[i % AVATARS.length].icon,
       score: 0,
-      isEliminatedThisRound: false
+      isEliminatedThisRound: false,
+      isBot: false
     });
   }
 
@@ -464,6 +668,18 @@ DOM.startSetupBtn.addEventListener('click', () => {
 // ==========================================
 function setupSecretWordRound() {
   const master = gameState.players[gameState.wordMasterIndex];
+
+  // Eğer Robot'a Karşı modundaysak ve kelimeyi tutan Robot ise:
+  // Robot doğrudan sözlükten rastgele kelime seçer ve oyunu başlatır!
+  if (gameState.isVsBot && master.isBot) {
+    const pick = getRandomBotWord();
+    gameState.secretWord = pick.word;
+    gameState.secretWordHint = pick.category;
+    showToast(`🤖 Robot bir kelime seçti (${pick.category})! Hadi tahmin et Aybars! 🎈`, 3000);
+    startRound();
+    return;
+  }
+
   DOM.wordMasterNameDisplay.textContent = `${master.avatar} ${master.name}`;
 
   DOM.secretWordInput.value = '';
@@ -471,6 +687,13 @@ function setupSecretWordRound() {
   DOM.toggleWordVisibilityBtn.textContent = '👁️';
   DOM.secretWordHint.value = '';
   DOM.categoryPills.forEach(p => p.classList.remove('active'));
+
+  // Yardımcı butonların görünürlüğü
+  if (gameState.isVsBot) {
+    if (DOM.letBotPickWordBtn) DOM.letBotPickWordBtn.style.display = 'inline-flex';
+  } else {
+    if (DOM.letBotPickWordBtn) DOM.letBotPickWordBtn.style.display = 'none';
+  }
 
   switchScreen('secret');
 }
@@ -496,6 +719,36 @@ DOM.categoryPills.forEach(pill => {
     DOM.secretWordHint.value = pill.dataset.cat;
   });
 });
+
+// Rastgele Kelime Öner Butonu
+if (DOM.randomWordSuggestBtn) {
+  DOM.randomWordSuggestBtn.addEventListener('click', () => {
+    sounds.playClick();
+    const pick = getRandomBotWord();
+    DOM.secretWordInput.value = pick.word;
+    DOM.secretWordInput.type = 'text';
+    DOM.toggleWordVisibilityBtn.textContent = '🙈';
+    DOM.secretWordHint.value = pick.category;
+
+    DOM.categoryPills.forEach(p => {
+      p.classList.remove('active');
+      if (p.dataset.cat === pick.category) {
+        p.classList.add('active');
+      }
+    });
+
+    showToast(`🎲 Rastgele Kelime: ${pick.word} (${pick.category})`, 2500);
+  });
+}
+
+// "Kelimeyi Robot Tutsun" Butonu (Aybars'ın kelime yazmak istemediğinde tıklayabileceği buton)
+if (DOM.letBotPickWordBtn) {
+  DOM.letBotPickWordBtn.addEventListener('click', () => {
+    sounds.playClick();
+    gameState.wordMasterIndex = 1; // Robot index
+    setupSecretWordRound();
+  });
+}
 
 // Kelimeyi Onayla ve Oyunu Başlat
 DOM.confirmWordBtn.addEventListener('click', () => {
@@ -524,6 +777,11 @@ function startRound() {
   gameState.mistakes = 0;
   gameState.isRoundActive = true;
 
+  if (gameState.botThinkingTimer) {
+    clearTimeout(gameState.botThinkingTimer);
+    gameState.botThinkingTimer = null;
+  }
+
   // Tüm oyuncuların elenme durumunu ve puan geçmişini sıfırla
   gameState.roundPointsRecord = {};
   gameState.players.forEach(p => {
@@ -547,7 +805,14 @@ function startRound() {
   updateTurnAnnouncementUI();
 
   switchScreen('game');
-  showToast(`🎮 Tur Başladı! Sıra ${gameState.players[gameState.currentGuesserIndex].name}'de!`);
+
+  const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+  if (currentGuesser.isBot) {
+    showToast(`🎮 Tur Başladı! Sıra ${currentGuesser.name}'de! Robot düşünüyor... 🤖`);
+    scheduleBotGuess(1400);
+  } else {
+    showToast(`🎮 Tur Başladı! Sıra ${currentGuesser.name}'de!`);
+  }
 }
 
 // Sıradaki aktif tahminciyi bulur (Kelimeyi tutan kişi ve elenenler hariç)
@@ -599,7 +864,18 @@ function updateTurnAnnouncementUI() {
   DOM.turnAnnouncementBox.style.display = 'flex';
   const currentGuesser = gameState.players[gameState.currentGuesserIndex];
   DOM.activeGuesserAvatar.textContent = currentGuesser.avatar;
-  DOM.activeGuesserName.textContent = currentGuesser.name;
+
+  if (currentGuesser.isBot) {
+    DOM.activeGuesserName.textContent = `${currentGuesser.name} (Düşünüyor... ⚙️)`;
+    DOM.openGuessModalBtn.disabled = true;
+    DOM.openGuessModalBtn.style.opacity = '0.5';
+    DOM.openGuessModalBtn.style.pointerEvents = 'none';
+  } else {
+    DOM.activeGuesserName.textContent = currentGuesser.name;
+    DOM.openGuessModalBtn.disabled = false;
+    DOM.openGuessModalBtn.style.opacity = '1';
+    DOM.openGuessModalBtn.style.pointerEvents = 'auto';
+  }
 }
 
 // Kelime Harf Kutularını Çiz
@@ -662,6 +938,9 @@ function handleLetterGuess(letter) {
   if (!gameState.isRoundActive || gameState.guessedLetters.has(letter)) return;
 
   const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+  // Eğer sıradaki tahminci robot ise ve bu çağrı robot fonksiyonundan gelmiyorsa engelle
+  if (currentGuesser?.isBot && !gameState.isBotExecuting) return;
+
   gameState.guessedLetters.add(letter);
 
   // Klavye butonunu güncelle
@@ -687,7 +966,12 @@ function handleLetterGuess(letter) {
 
     renderWordBoxes();
     updateScoreboardUI();
-    showToast(`👏 ${currentGuesser.name} "${letter}" harfini bildi! (+${pts} Puan) Doğru bildiğin için sıra sende kaldı! 🎯`, 3000);
+
+    if (currentGuesser.isBot) {
+      showToast(`🤖 Robot "${letter}" harfini bildi! (+${pts} Puan)`, 2000);
+    } else {
+      showToast(`👏 ${currentGuesser.name} "${letter}" harfini bildi! (+${pts} Puan) Doğru bildiğin için sıra sende kaldı! 🎯`, 3000);
+    }
 
     // Kelimenin tamamı açıldı mı kontrol et
     if (isWordFullyRevealed()) {
@@ -704,6 +988,11 @@ function handleLetterGuess(letter) {
     DOM.turnAnnouncementBox.classList.remove('pulse-glow');
     void DOM.turnAnnouncementBox.offsetWidth;
     DOM.turnAnnouncementBox.classList.add('pulse-glow');
+
+    // Eğer robot doğru bildiyse ve tur devam ediyorsa bir sonraki robot tahminini planla
+    if (currentGuesser.isBot && gameState.isRoundActive) {
+      scheduleBotGuess(1400);
+    }
   } else {
     // YANLIŞ HARF
     if (btn) btn.classList.add('wrong');
@@ -715,7 +1004,11 @@ function handleLetterGuess(letter) {
     sounds.playWrongLetter(gameState.mistakes);
     triggerHangmanMistakeReaction(gameState.mistakes);
 
-    showToast(`❌ "${letter}" harfi kelimede yok!`);
+    if (currentGuesser.isBot) {
+      showToast(`❌ Robot "${letter}" harfini bilemedi!`);
+    } else {
+      showToast(`❌ "${letter}" harfi kelimede yok!`);
+    }
 
     // 7. KURAL: Eğer adam asılırsa
     if (gameState.mistakes >= gameState.maxMistakes) {
@@ -739,6 +1032,86 @@ function advanceTurn() {
   gameState.currentGuesserIndex = nextGuesser;
   updateScoreboardUI();
   updateTurnAnnouncementUI();
+
+  // Sıradaki tahminci robot ise tahminini planla
+  if (gameState.players[gameState.currentGuesserIndex]?.isBot && gameState.isRoundActive) {
+    scheduleBotGuess(1300);
+  }
+}
+
+// ==========================================
+// 10.1. ROBOT YAPAY ZEKA TAHMİN SİSTEMİ
+// ==========================================
+function scheduleBotGuess(delayMs = 1200) {
+  if (gameState.botThinkingTimer) {
+    clearTimeout(gameState.botThinkingTimer);
+    gameState.botThinkingTimer = null;
+  }
+
+  gameState.botThinkingTimer = setTimeout(() => {
+    if (!gameState.isRoundActive) return;
+    const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+    if (!currentGuesser || !currentGuesser.isBot) return;
+
+    performBotGuess();
+  }, delayMs);
+}
+
+function performBotGuess() {
+  // Henüz tahmin edilmemiş harfleri bul
+  const unrevealedLetters = TURKISH_ALPHABET.filter(l => !gameState.guessedLetters.has(l));
+  if (unrevealedLetters.length === 0) return;
+
+  // Gizli kelimede olup henüz tahmin edilmemiş harfler
+  const secretChars = Array.from(new Set(gameState.secretWord.split('').filter(c => c !== ' ')));
+  const unrevealedSecretChars = secretChars.filter(c => !gameState.guessedLetters.has(c));
+
+  // Türkçe harf frekansı (çocuk kelimelerine göre)
+  const TURKISH_FREQ = [
+    'A', 'E', 'İ', 'N', 'R', 'L', 'I', 'D', 'K', 'M',
+    'U', 'Y', 'T', 'S', 'B', 'O', 'Ü', 'Ş', 'Z', 'G',
+    'Ç', 'H', 'P', 'C', 'V', 'Ö', 'Ğ', 'F', 'J'
+  ];
+
+  let chosenLetter = null;
+
+  // Robot zekası: %65 ihtimalle doğru harflerden veya yaygın harflerden seçer
+  // %35 ihtimalle yanlış harf seçer (böylece oyun dengeli ve eğlenceli olur)
+  const isSmartMove = Math.random() < 0.65;
+
+  if (isSmartMove && unrevealedSecretChars.length > 0) {
+    // Gizli harflerden birini seç
+    chosenLetter = unrevealedSecretChars[Math.floor(Math.random() * unrevealedSecretChars.length)];
+  } else {
+    // Yaygın frekanstaki harflerden veya rastgele unrevealed harflerden seç
+    const availableFreqLetters = TURKISH_FREQ.filter(l => unrevealedLetters.includes(l));
+    if (availableFreqLetters.length > 0 && Math.random() < 0.5) {
+      const topFreq = availableFreqLetters.slice(0, Math.min(8, availableFreqLetters.length));
+      chosenLetter = topFreq[Math.floor(Math.random() * topFreq.length)];
+    } else {
+      chosenLetter = unrevealedLetters[Math.floor(Math.random() * unrevealedLetters.length)];
+    }
+  }
+
+  if (!chosenLetter) {
+    chosenLetter = unrevealedLetters[0];
+  }
+
+  // Robot konuşma baloncuğu
+  const quotes = [
+    `Bip-bop! Devrelerim "${chosenLetter}" harfini söylüyor! 🤖`,
+    `Analiz tamam! Harfim: "${chosenLetter}"! ⚙️`,
+    `Acaba içinde "${chosenLetter}" var mı? Merak ettim! 🔍`,
+    `Robotik tahminim: "${chosenLetter}"! 🤖⚡`,
+    `Hesaplamalar yapıldı! "${chosenLetter}" harfine basıyorum! 🦾`
+  ];
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  triggerHangmanSpeech(quote, 2200);
+
+  // Harf tahminini çalıştır
+  gameState.isBotExecuting = true;
+  handleLetterGuess(chosenLetter);
+  gameState.isBotExecuting = false;
 }
 
 // Kelimenin tüm harfleri bilindi mi?
@@ -759,6 +1132,8 @@ DOM.openGuessModalBtn.addEventListener('click', () => {
   if (!gameState.isRoundActive) return;
 
   const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+  if (currentGuesser?.isBot) return;
+
   DOM.modalGuesserName.textContent = `${currentGuesser.avatar} ${currentGuesser.name}`;
   DOM.fullWordGuessInput.value = '';
   DOM.guessWordModal.classList.add('active');
@@ -1299,6 +1674,10 @@ DOM.endGameEarlyBtn.addEventListener('click', () => {
 DOM.restartGameBtn.addEventListener('click', () => {
   sounds.playClick();
   DOM.gameOverModal.classList.remove('active');
+  if (gameState.botThinkingTimer) {
+    clearTimeout(gameState.botThinkingTimer);
+    gameState.botThinkingTimer = null;
+  }
   switchScreen('setup');
 });
 
@@ -1382,6 +1761,7 @@ window.addEventListener('keydown', (e) => {
 
   const pressedChar = toTurkishUpper(e.key);
   if (TURKISH_ALPHABET.includes(pressedChar)) {
+    if (gameState.players[gameState.currentGuesserIndex]?.isBot) return;
     handleLetterGuess(pressedChar);
   }
 });
