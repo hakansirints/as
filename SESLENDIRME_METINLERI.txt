@@ -1,0 +1,118 @@
+=== AYBARS ADAM ASMACA - SESLENDIRME METINLERI ===
+
+--- 1. HATA (Pervaneli Kafa) ---
+hata1_1.mp3 : Ayy! İlk hatada beni mi çağırdınız?!
+hata1_2.mp3 : Merhaba! Lütfen nazik olun, ben daha çok yeniyim!
+hata1_3.mp3 : Hop! Dikkatli seçin, burası biraz rüzgarlı!
+hata1_4.mp3 : Kafam çıktı piyasaya, aman dikkat!
+hata1_5.mp3 : Pervanem dönmeye başladı, başım dönüyor!
+hata1_6.mp3 : Biri bana şapka takmış, çok da yakışmış ama harfi bilemediniz!
+hata1_7.mp3 : Daha ilk harften yanıldık mı yani? Şaka yapıyorsunuz!
+hata1_8.mp3 : Eyvah! Havada asılı kalmak hiç tarzım değil!
+hata1_9.mp3 : Ben buraların yabancısıyım, beni erken asmayın lütfen!
+hata1_10.mp3 : Ooo merhaba çocuklar! Doğru harfleri seçin de çay içelim!
+
+--- 2. HATA (Gövde ve Papyon) ---
+hata2_1.mp3 : Hop noluyor?! Gömleğim kırıştı yahu!
+hata2_2.mp3 : Karnım guruldadı, bari bir sesli harf bilin!
+hata2_3.mp3 : Bir ürperti geldi... Lütfen yanlış basmayın!
+hata2_4.mp3 : Gövdem geldi ama kalbim pır pır ediyor!
+hata2_5.mp3 : Papyonumu taktım ama düğüne değil darağacına gidiyorum galiba!
+hata2_6.mp3 : Tişörtümün çizgileri titremekten dalgalandı!
+hata2_7.mp3 : Acıktım valla, pizza ısmarlayan yok mu?
+hata2_8.mp3 : Bakın kalbim küt küt atıyor, hissediyorum!
+hata2_9.mp3 : Lütfen A, E falan deneyin, ne bileyim ipucuna bakın!
+hata2_10.mp3 : Bedenim oluştu ama ruhum firar etmek üzere!
+
+--- 3. HATA (Sol Kol) ---
+hata3_1.mp3 : İmdat! Sol kolum havada kaldı!
+hata3_2.mp3 : Harflere dikkat! Koluma kramp girecek!
+hata3_3.mp3 : Bu harf hiç olmadı ama yaa!
+hata3_4.mp3 : Sol kolumla el sallıyorum: Kurtarın beni!
+hata3_5.mp3 : Sarı eldivenim çok şık ama havada dondu kaldı!
+hata3_6.mp3 : Aaa kolum çıktı! Şimdi burnumu kaşıyabilirim en azından!
+hata3_7.mp3 : Yanlış harf seçme festivali mi var bugün?!
+hata3_8.mp3 : Sol kolumla size kocaman bir sıfır çiziyorum, bilemediniz!
+hata3_9.mp3 : Kolumu indirin lütfen, çok yoruldum!
+hata3_10.mp3 : Anneee! Bu çocuklar beni asıyor galiba!
+
+--- 4. HATA (Sağ Kol / İki Kol Havada) ---
+hata4_1.mp3 : Bari iki kolumu birden bağlamasaydınız!
+hata4_2.mp3 : Annemi istiyorum! Yanlış basmayın artık!
+hata4_3.mp3 : Kollarımla alkışlayamıyorum bile yahu!
+hata4_4.mp3 : Eyvah eyvah, iki kolum da havalarda!
+hata4_5.mp3 : İki kolumla kuş gibi uçacağım şimdi, kanatlanıyorum!
+hata4_6.mp3 : Teslim oluyorum polis amca! Ben bir şey yapmadım!
+hata4_7.mp3 : Sarılmak istesem sarılamam, bu ne biçim vaziyet!
+hata4_8.mp3 : Harf klavyesine bir büyü yapılmış olmalı, her şey ters gidiyor!
+hata4_9.mp3 : Eller yukarı, bu bir soygundur! Harflerimi çaldınız!
+hata4_10.mp3 : İki kolum da sepet oldu, sallanıp duruyorum!
+
+--- 5. HATA (Bacak, Büyük Panik) ---
+hata5_1.mp3 : Tir tir titriyorum! Tek bir canım kaldı!
+hata5_2.mp3 : Ayaklarım yerden kesildi, nefes alamıyorum!
+hata5_3.mp3 : Son şansınız! Lütfen kelimeyi kurtarın!
+hata5_4.mp3 : Bacaklarım zangır zangır titriyor, bir harf daha bitti!
+hata5_5.mp3 : Tek bacakla bale yapıyorum, bakın kuğu gölü balem!
+hata5_6.mp3 : Ter damlalarım sel oldu, yüzme bilen var mı?!
+hata5_7.mp3 : Gözünüzü seveyim doğru harfe basın, son durağa geldik!
+hata5_8.mp3 : Aklınızı başınıza toplayın çocuklar, uçurumun kenarındayız!
+hata5_9.mp3 : Sol bacağım uyuştu, ayakkabım yere değmiyor!
+hata5_10.mp3 : Alarm! Kırmızı alarm! Bir hata daha olursa helvamı yersiniz!
+
+--- 6. HATA (Adam Asıldı / Oyun Bitti) ---
+hata6_1.mp3 : Gözlerim fırıldak oldu! Yıldızları sayıyorum...
+hata6_2.mp3 : Ben dedim o harf değil diye! Ruhum uçtu...
+hata6_3.mp3 : Olamazzz! Helvam fıstıklı olsun bari!
+hata6_4.mp3 : Asıldım gittim! Görüşürüz öbür dünyada!
+hata6_5.mp3 : Bayıldım galiba... Biri bana limon koklatsın!
+hata6_6.mp3 : Elveda tatlı hayat, elveda güzel Türkçemiz!
+hata6_7.mp3 : Pervanem durdu, şalterler kapandı... Bip!
+hata6_8.mp3 : Yıldızlar etrafımda halay çekiyor, ne güzelmiş burası!
+hata6_9.mp3 : Size küstüm, bir dahaki sefere daha iyi oynayın!
+hata6_10.mp3 : Gözlerim çarpı çarpı oldu, game over!
+
+--- DOĞRU HARF BİLİNDİĞİNDE ---
+dogru_1.mp3 : Oh be! Rahat bir nefes aldım!
+dogru_2.mp3 : Harikasın! Böyle devam et!
+dogru_3.mp3 : Süper harf! Kurtuluyorum galiba!
+dogru_4.mp3 : Helal olsun, işte beklediğim harf!
+dogru_5.mp3 : Kalbim ferahladı, yaşasın!
+dogru_6.mp3 : Aferin sana! Zekana hayran kaldım!
+dogru_7.mp3 : İşte bu! Adım adım özgürlüğe!
+dogru_8.mp3 : Harikasınız çocuklar, şapkam bile sevindi!
+dogru_9.mp3 : Bingo! İşte aradığımız harf tam da buydu!
+dogru_10.mp3 : Korkularım uçtu gitti, yaşasın!
+
+--- İPUCU KULLANILDIĞINDA ---
+ipucu_1.mp3 : Sihirli bir kuş kulağıma ipucu fısıldadı!
+ipucu_2.mp3 : Dayanamadım bir harfi hediye ettim, hadi iyisiniz!
+ipucu_3.mp3 : İşte beklediğiniz kurtarıcı harf parıldadı!
+ipucu_4.mp3 : Biraz yardımın kimseye zararı olmaz, işte harf!
+ipucu_5.mp3 : Gözlerimi kapattım ve gizli bir harfi açıverdim!
+
+--- SÜRE DOLDUĞUNDA ---
+sure_1.mp3 : Tik tak tik tak! Zaman doldu, sıra geçti!
+sure_2.mp3 : Süre bitti arkadaşım, saat tıkır tıkır işliyor!
+sure_3.mp3 : Uyuya kaldınız galiba, kum saati boşaldı!
+sure_4.mp3 : Zaman su gibi aktı! Bir dahaki tura daha hızlı ol!
+
+--- GIDIKLAMA (MASKOTA TIKLAYINCA) ---
+gidik_1.mp3 : Hehe gıdıklama beni! Yapma!
+gidik_2.mp3 : Hey dokunma oraya, çok huylanıyorum!
+gidik_3.mp3 : Dur dur güldürme, harflere odaklanın!
+gidik_4.mp3 : Beni bırak da kelimeyi tahmin et!
+gidik_5.mp3 : Gıdık gıdık! Haha kaçıyorum!
+
+--- YANLIŞ KELİME TAHMİNİ (ELENME) ---
+elenme_1.mp3 : Aman tanrım! O kelime hiç olmadı!
+elenme_2.mp3 : Eyvah, büyük risk aldın ve elendin!
+elenme_3.mp3 : Cesurcaydı ama maalesef yanlış!
+elenme_4.mp3 : Bütün şansını tek kelimede harcadın ve elendin!
+
+--- AKILLI ROBOT ---
+robot_1.mp3 : Bip-bop! Devrelerim bu harfi söylüyor!
+robot_2.mp3 : Analiz tamam! Şimdi sıra benim tahminimde!
+robot_3.mp3 : Acaba içinde bu harf var mı? Çok merak ettim!
+robot_4.mp3 : Robotik tahminim hazır! Sistemler çalışıyor!
+robot_5.mp3 : Hesaplamalar yapıldı! Tuşa basıyorum, bip-bop!
