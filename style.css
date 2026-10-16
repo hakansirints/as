@@ -18,14 +18,37 @@
   
   --bg-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 50%, #fed6e3 100%);
   --card-bg: #ffffff;
+  --card-border: #ffffff;
+  --card-shadow: 0 16px 36px rgba(44, 62, 80, 0.12);
   --text-dark: #2c3e50;
   --text-muted: #64748b;
+  --input-bg: #f8fafc;
+  --input-border: #e2e8f0;
+  --key-bg: #f1f5f9;
+  --key-border: #cbd5e1;
+  --key-text: #334155;
+  --modal-backdrop: rgba(15, 23, 42, 0.65);
   --border-radius-lg: 24px;
   --border-radius-md: 16px;
   --border-radius-sm: 10px;
   
   --font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-title: 'Grandstander', cursive, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #17182e 50%, #241438 100%);
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  --card-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+  --text-dark: #f8fafc;
+  --text-muted: #94a3b8;
+  --input-bg: #0f172a;
+  --input-border: #334155;
+  --key-bg: #0f172a;
+  --key-border: #334155;
+  --key-text: #f8fafc;
+  --modal-backdrop: rgba(0, 0, 0, 0.85);
 }
 
 * {
@@ -218,8 +241,8 @@ body {
   background: var(--card-bg);
   border-radius: var(--border-radius-lg);
   padding: 24px;
-  box-shadow: 0 16px 36px rgba(44, 62, 80, 0.12);
-  border: 4px solid #ffffff;
+  box-shadow: var(--card-shadow);
+  border: 4px solid var(--card-border);
   position: relative;
   transition: opacity 0.3s ease, transform 0.3s ease;
   overflow: hidden;
@@ -1942,3 +1965,470 @@ body {
   .second-place .podium-block { height: 55px; font-size: 1rem; }
   .third-place .podium-block { height: 40px; font-size: 0.85rem; }
 }
+
+/* =========================================================
+   17. OYUN AYARLARI MENÜSÜ & İPUCU & SÜRE SİSTEMİ STİLLERİ
+   ========================================================= */
+
+/* Ayarlar Giriş Butonu (Setup Ekranı) */
+.settings-entry-btn {
+  background: #f1f5f9;
+  border: 2px dashed #94a3b8;
+  border-radius: var(--border-radius-md);
+  padding: 10px 16px;
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.settings-entry-btn:hover {
+  background: #e2e8f0;
+  border-color: #6366f1;
+  color: #4338ca;
+  transform: translateY(-2px);
+}
+
+/* Ayarlar Modalı */
+.settings-card {
+  max-width: 560px;
+  width: 95%;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+  text-align: left;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: var(--border-radius-md);
+  border: 2px solid #e2e8f0;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.setting-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.setting-icon {
+  font-size: 1.6rem;
+  min-width: 36px;
+  text-align: center;
+}
+
+.setting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setting-text strong {
+  font-size: 0.98rem;
+  color: var(--text-dark);
+}
+
+.setting-text small {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Tema Seçim Grubu */
+.theme-switch-group {
+  display: flex;
+  background: #e2e8f0;
+  border-radius: 20px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.theme-choice-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.theme-choice-btn.active {
+  background: white;
+  color: #1e293b;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* iOS/Material Tarzı Şirin Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  transition: .28s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .28s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+}
+
+input:checked + .toggle-slider {
+  background-color: #10b981;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* Neşeli Select ve Range Slider */
+.fun-select {
+  background: white;
+  border: 2px solid #cbd5e1;
+  border-radius: var(--border-radius-sm);
+  padding: 6px 10px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  outline: none;
+}
+
+.fun-range-slider {
+  width: 120px;
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+
+/* Aksiyon Butonları Sırası (İpucu + Kelime Tahmin) */
+.action-buttons-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.hint-action-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  border: 3px solid #d97706;
+  border-radius: var(--border-radius-md);
+  color: #78350f;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 0 #b45309;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.hint-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #b45309;
+  filter: brightness(1.05);
+}
+
+.hint-action-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #b45309;
+}
+
+.hint-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+  transform: none;
+  box-shadow: 0 2px 0 #b45309;
+}
+
+/* Turn Timer Bar */
+.turn-timer-container {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: var(--border-radius-sm);
+  padding: 6px 12px;
+  margin-bottom: 8px;
+  animation: popIn 0.3s ease;
+}
+
+.timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+.timer-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timer-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);
+  transition: width 0.9s linear;
+  border-radius: 4px;
+}
+
+/* =========================================================
+   18. KARANLIK MOD (DARK THEME) STİLLERİ
+   ========================================================= */
+[data-theme="dark"] body {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .subtitle {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .modal-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .modal-backdrop {
+  background: var(--modal-backdrop);
+}
+
+[data-theme="dark"] .welcome-banner h2,
+[data-theme="dark"] .player-names-container h3,
+[data-theme="dark"] .secret-role-badge h2,
+[data-theme="dark"] .word-input-group label,
+[data-theme="dark"] .hint-input-group label,
+[data-theme="dark"] .settings-card h3,
+[data-theme="dark"] .guess-risk-note {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .player-input-row {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+}
+
+[data-theme="dark"] .player-input-row input {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .player-avatar-badge {
+  background: #1e293b;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .count-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .count-btn .count-num {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .count-btn:hover {
+  background: #1e293b;
+  border-color: #64748b;
+}
+
+[data-theme="dark"] .count-btn.active {
+  background: #3b1828;
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .count-btn.vs-bot-btn.active {
+  background: #1e1b4b;
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .count-btn.vs-bot-btn.active .count-num,
+[data-theme="dark"] .count-btn.vs-bot-btn.active .count-label {
+  color: #c7d2fe;
+}
+
+[data-theme="dark"] .input-with-button input,
+[data-theme="dark"] .hint-input-group input,
+[data-theme="dark"] .modal-input-group input {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .key-btn {
+  background: var(--key-bg);
+  border-color: var(--key-border);
+  color: var(--key-text);
+  box-shadow: 0 4px 0 #020617;
+}
+
+[data-theme="dark"] .key-btn:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .letter-box {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+  box-shadow: 0 4px 0 #020617;
+}
+
+[data-theme="dark"] .gallows-wrapper {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .floating-action-btn {
+  background: #1e293b;
+  border-color: #6366f1;
+  color: #f8fafc;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .floating-action-btn:hover {
+  background: #312e81;
+}
+
+[data-theme="dark"] .player-status-card {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .player-status-card .p-name {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .turn-announcement-box {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .category-badge {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .setting-item {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .theme-switch-group {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .theme-choice-btn.active {
+  background: #6366f1;
+  color: white;
+}
+
+[data-theme="dark"] .toggle-slider {
+  background-color: #334155;
+}
+
+[data-theme="dark"] input:checked + .toggle-slider {
+  background-color: #6366f1;
+}
+
+[data-theme="dark"] .fun-select {
+  background: #1e293b;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .settings-entry-btn {
+  background: #0f172a;
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .settings-entry-btn:hover {
+  background: #1e293b;
+  border-color: #818cf8;
+  color: #c7d2fe;
+}
+
+[data-theme="dark"] .turn-timer-container {
+  background: #2b1f0c;
+  border-color: #d97706;
+}
+
+[data-theme="dark"] .timer-header {
+  color: #fde68a;
+}
+
+[data-theme="dark"] .secret-revealed-box,
+[data-theme="dark"] .round-points-breakdown,
+[data-theme="dark"] .all-scores-summary {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .points-list li,
+[data-theme="dark"] .final-score-list .score-row {
+  background: #1e293b;
+  color: #f8fafc;
+}
+

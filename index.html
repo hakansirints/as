@@ -24,8 +24,14 @@
     <span class="floating-balloon b6">🎨</span>
   </div>
 
-  <!-- Üst Kısayol Butonları (Tam Ekran & Ses) -->
+  <!-- Üst Kısayol Butonları (Tema, Ayarlar, Tam Ekran & Ses) -->
   <div class="top-floating-actions">
+    <button id="themeToggleBtn" class="floating-action-btn" title="Karanlık / Aydınlık Mod" aria-label="Tema Değiştir">
+      <span id="themeIcon">🌙</span>
+    </button>
+    <button id="settingsToggleBtn" class="floating-action-btn" title="Oyun Ayarları" aria-label="Ayarlar">
+      <span id="settingsIcon">⚙️</span>
+    </button>
     <button id="fullscreenToggleBtn" class="floating-action-btn" title="Tam Ekran Yap / Çık" aria-label="Tam Ekran">
       <span id="fullscreenIcon">⛶</span>
     </button>
@@ -94,6 +100,11 @@
         <!-- Başla Butonu -->
         <button id="startSetupBtn" class="primary-fun-btn pulse-glow">
           <span>Hadi Başlayalım! 🚀</span>
+        </button>
+
+        <!-- Oyun Ayarları Giriş Butonu -->
+        <button type="button" id="openSettingsFromSetupBtn" class="settings-entry-btn">
+          <span>⚙️ Oyun Ayarları & Tercihler</span>
         </button>
       </div>
     </section>
@@ -336,6 +347,18 @@
             <div id="playersStatusList" class="players-status-list"></div>
           </div>
 
+          <!-- Süre Sayacı Barı (Ayar aktifse görünür) -->
+          <div id="turnTimerContainer" class="turn-timer-container" style="display: none;">
+            <div class="timer-header">
+              <span class="timer-icon">⏱️</span>
+              <span class="timer-label">Kalan Süre:</span>
+              <strong id="turnTimerSeconds">30</strong>s
+            </div>
+            <div class="timer-progress-track">
+              <div id="turnTimerProgressBar" class="timer-progress-fill"></div>
+            </div>
+          </div>
+
           <!-- Sıradaki Tahminci Duyuru Kutusu -->
           <div id="turnAnnouncementBox" class="turn-announcement-box">
             <span class="turn-avatar" id="activeGuesserAvatar">🦊</span>
@@ -354,12 +377,18 @@
             <!-- Harf Çizgileri / Kutucukları -->
             <div id="wordLettersContainer" class="word-letters-container"></div>
 
-            <!-- Hızlı Tam Kelime Tahmin Butonu -->
+            <!-- Hızlı Tam Kelime Tahmin & Harf İpucu Butonları -->
             <div class="guess-word-action-box">
-              <button id="openGuessModalBtn" class="guess-full-word-btn">
-                <span class="icon">💡</span>
-                <span class="btn-text">Biliyorum! Kelimeyi Tahmin Et (+50 Puan)</span>
-              </button>
+              <div class="action-buttons-row">
+                <button type="button" id="useHintBtn" class="hint-action-btn" title="Kelimenin gizli bir harfini aç">
+                  <span class="icon">✨</span>
+                  <span class="btn-text">İpucu Harfi (<span id="currentGuesserHintBadge">1</span>)</span>
+                </button>
+                <button type="button" id="openGuessModalBtn" class="guess-full-word-btn">
+                  <span class="icon">💡</span>
+                  <span class="btn-text">Kelimeyi Tahmin Et (+50)</span>
+                </button>
+              </div>
               <p class="guess-risk-note">⚠️ Yanlış tahmin edersen bu tur elenirsin!</p>
             </div>
           </div>
@@ -443,6 +472,159 @@
         <button id="restartGameBtn" class="primary-fun-btn">
           <span>Yeniden Oyna! 🔄</span>
         </button>
+      </div>
+    </div>
+
+    <!-- MODAL 4: Oyun Ayarları Menüsü -->
+    <div id="settingsModal" class="modal-backdrop">
+      <div class="modal-card settings-card bounce-in">
+        <button id="closeSettingsModalBtn" class="modal-close-btn" title="Kapat">&times;</button>
+        <div class="modal-header-icon">⚙️🎨</div>
+        <h3>Oyun Ayarları</h3>
+        <p class="modal-subtitle">Oyun kurallarını ve deneyimini özelleştirin!</p>
+
+        <div class="settings-list">
+          <!-- Ayar 1: Tema (Karanlık / Aydınlık) -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">🌓</span>
+              <div class="setting-text">
+                <strong>Görünüm Teması</strong>
+                <small>Aydınlık (Gündüz) veya Karanlık (Gece) modu</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <div class="theme-switch-group">
+                <button type="button" class="theme-choice-btn active" id="themeBtnLight" data-theme-val="light">☀️ Gündüz</button>
+                <button type="button" class="theme-choice-btn" id="themeBtnDark" data-theme-val="dark">🌙 Gece</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ayar 2: İpucu Hakkı -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">🔍</span>
+              <div class="setting-text">
+                <strong>Harf İpucu Hakkı</strong>
+                <small>Her oyuncuya turda 1 gizli harf açma hakkı ver</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="settingHintsToggle" checked>
+                <span class="toggle-slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ayar 3: Doğru Bilince Sıra Sende Kalsın -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">🎯</span>
+              <div class="setting-text">
+                <strong>Doğru Bilince Sıra Kalsın</strong>
+                <small>Açık: Bilen tekrar tahmin eder | Kapalı: Sıra devreder</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="settingKeepTurnToggle" checked>
+                <span class="toggle-slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ayar 4: Ses Efektleri -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">🔊</span>
+              <div class="setting-text">
+                <strong>Oyun Sesleri</strong>
+                <small>Buton, başarı ve karikatür ses efektleri</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="settingSoundToggle" checked>
+                <span class="toggle-slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ayar 5: Ses Seviyesi Slider -->
+          <div class="setting-item" id="volumeSettingItem">
+            <div class="setting-info">
+              <span class="setting-icon">🎚️</span>
+              <div class="setting-text">
+                <strong>Ses Seviyesi</strong>
+                <small id="volumeLevelText">%80</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <input type="range" id="settingVolumeSlider" min="10" max="100" value="80" class="fun-range-slider">
+            </div>
+          </div>
+
+          <!-- Ayar 6: Canlı Karakter Seslendirmesi (TTS) -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">🗣️</span>
+              <div class="setting-text">
+                <strong>Karakter Seslendirmesi</strong>
+                <small>Asılan adam ve robot replikleri Türkçe konuşsun</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="settingVoiceToggle" checked>
+                <span class="toggle-slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ayar 7: Tur Başına Süre Sınırı -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">⏱️</span>
+              <div class="setting-text">
+                <strong>Süre Sınırı (Heyecan Sayacı)</strong>
+                <small>Her tahmin sırası için süre sınırı belirleyin</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <select id="settingTimerSelect" class="fun-select">
+                <option value="0">⏳ Süresiz (Rahat)</option>
+                <option value="30">⚡ 30 Saniye (Heyecanlı)</option>
+                <option value="60">⏱️ 60 Saniye (Dengeli)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Ayar 8: Robot Zorluk Seviyesi -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-icon">🤖</span>
+              <div class="setting-text">
+                <strong>Robot Zorluk Derecesi</strong>
+                <small>Robotun tahmin isabeti ve oyun tarzı</small>
+              </div>
+            </div>
+            <div class="setting-control">
+              <select id="settingBotDiffSelect" class="fun-select">
+                <option value="easy">🟢 Kolay (Şaşkın Robot)</option>
+                <option value="normal" selected>🟡 Normal (Dengeli)</option>
+                <option value="smart">🔴 Zeki (Süper Robot)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="saveSettingsBtn" class="primary-fun-btn">
+            <span>Tamam, Kaydet! 👍</span>
+          </button>
+        </div>
       </div>
     </div>
 

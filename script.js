@@ -10,6 +10,7 @@ class SoundEngine {
   constructor() {
     this.audioCtx = null;
     this.enabled = true;
+    this.volume = 0.8;
   }
 
   init() {
@@ -29,6 +30,10 @@ class SoundEngine {
     return this.enabled;
   }
 
+  setVolume(level) {
+    this.volume = Math.max(0, Math.min(1, level));
+  }
+
   playTone(freq, type = 'sine', duration = 0.15, startDelay = 0, gainLevel = 0.2) {
     if (!this.enabled) return;
     this.init();
@@ -38,11 +43,12 @@ class SoundEngine {
       const osc = this.audioCtx.createOscillator();
       const gain = this.audioCtx.createGain();
       const now = this.audioCtx.currentTime + startDelay;
+      const effectiveGain = gainLevel * this.volume;
 
       osc.type = type;
       osc.frequency.setValueAtTime(freq, now);
 
-      gain.gain.setValueAtTime(gainLevel, now);
+      gain.gain.setValueAtTime(effectiveGain, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
       osc.connect(gain);
@@ -79,7 +85,7 @@ class SoundEngine {
       osc.frequency.setValueAtTime(startFreq, now);
       osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.28);
 
-      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.setValueAtTime(0.22 * this.volume, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
 
       osc.connect(gain);
@@ -95,7 +101,7 @@ class SoundEngine {
         osc2.type = 'triangle';
         osc2.frequency.setValueAtTime(450 + mistakeNumber * 50, now + 0.06);
         osc2.frequency.exponentialRampToValueAtTime(120, now + 0.32);
-        gain2.gain.setValueAtTime(0.18, now + 0.06);
+        gain2.gain.setValueAtTime(0.18 * this.volume, now + 0.06);
         gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
         osc2.connect(gain2);
         gain2.connect(this.audioCtx.destination);
@@ -134,6 +140,25 @@ class SoundEngine {
     });
   }
 
+  // İpucu kullanıldığında büyülü şıkırtı sesi
+  playHintSparkle() {
+    const sparkleNotes = [587.33, 739.99, 880.00, 1174.66, 1479.98]; // D5, F#5, A5, D6, F#6
+    sparkleNotes.forEach((freq, idx) => {
+      this.playTone(freq, 'sine', 0.18, idx * 0.05, 0.22);
+    });
+  }
+
+  // Süre sayacı tik sesi (Son saniyelerde uyarır)
+  playTimerTick() {
+    this.playTone(950, 'sine', 0.04, 0, 0.1);
+  }
+
+  // Süre dolduğunda komik alarm sesi
+  playTimerAlarm() {
+    this.playTone(400, 'square', 0.12, 0, 0.18);
+    this.playTone(300, 'square', 0.22, 0.12, 0.2);
+  }
+
   // Buton tıklama
   playClick() {
     this.playTone(800, 'sine', 0.05, 0, 0.1);
@@ -141,6 +166,148 @@ class SoundEngine {
 }
 
 const sounds = new SoundEngine();
+
+// ==========================================
+// 1.1. CANLI SESLENDİRME MOTORU (Web Speech API)
+// ==========================================
+class SpeechEngine {
+  constructor() {
+    this.synth = (typeof window !== 'undefined' && 'speechSynthesis' in window) ? window.speechSynthesis : null;
+    this.voices = [];
+    this.trVoice = null;
+    this.init();
+  }
+
+  init() {
+    if (!this.synth) return;
+    this.loadVoices();
+    if (this.synth.onvoiceschanged !== undefined) {
+      this.synth.onvoiceschanged = () => this.loadVoices();
+    }
+  }
+
+  loadVoices() {
+    if (!this.synth) return;
+    this.voices = this.synth.getVoices();
+    this.trVoice = this.voices.find(v => v.lang && (v.lang.startsWith('tr') || v.lang.includes('TR'))) || null;
+  }
+
+  speak(text, isBot = false) {
+    if (!this.synth || !gameState.settings.voiceEnabled || !sounds.enabled) return;
+
+    try {
+      this.synth.cancel();
+
+      // Emojileri, sembolleri ve ünlemleri sadeleştir
+      let clean = text
+        .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+        .replace(/[\u{1F600}-\u{1F64F}\u{1FA00}-\u{1FAFF}]/gu, '')
+        .replace(/[0-9+:\/\\#_]+/g, ' ')
+        .trim();
+
+      if (!clean) return;
+
+      const utterance = new SpeechSynthesisUtterance(clean);
+      utterance.lang = 'tr-TR';
+      if (this.trVoice) {
+        utterance.voice = this.trVoice;
+      }
+
+      const volFactor = gameState.settings.volume / 100;
+      utterance.volume = Math.max(0.1, volFactor);
+
+      if (isBot) {
+        utterance.pitch = 0.85; // Robotik daha pes
+        utterance.rate = 1.0;
+      } else {
+        utterance.pitch = 1.35; // Sevimli çizgi film tonu
+        utterance.rate = 1.08;
+      }
+
+      this.synth.speak(utterance);
+    } catch (e) {
+      console.warn('Speech error:', e);
+    }
+  }
+
+  stop() {
+    if (this.synth) {
+      try {
+        this.synth.cancel();
+      } catch (e) {}
+    }
+  }
+}
+
+const speech = new SpeechEngine();
+
+// ==========================================
+// 1.2. OYUN AYARLARI SİSTEMİ (Local Storage Destekli)
+// ==========================================
+const DEFAULT_SETTINGS = {
+  theme: 'light',
+  hintsEnabled: true,
+  keepTurnOnCorrect: true,
+  soundEnabled: true,
+  volume: 80,
+  voiceEnabled: true,
+  timerMode: 0, // 0: Süresiz, 30: 30sn, 60: 60sn
+  botDifficulty: 'normal' // 'easy', 'normal', 'smart'
+};
+
+function loadSettings() {
+  try {
+    const saved = localStorage.getItem('aybars_game_settings');
+    if (saved) {
+      return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(saved));
+    }
+  } catch (e) {}
+  return Object.assign({}, DEFAULT_SETTINGS);
+}
+
+function saveSettings(newSettings) {
+  gameState.settings = Object.assign({}, gameState.settings, newSettings);
+  try {
+    localStorage.setItem('aybars_game_settings', JSON.stringify(gameState.settings));
+  } catch (e) {}
+  applySettings();
+}
+
+function applySettings() {
+  const s = gameState.settings;
+
+  // 1. Tema Uygula
+  document.documentElement.setAttribute('data-theme', s.theme);
+  if (DOM.themeIcon) {
+    DOM.themeIcon.textContent = (s.theme === 'dark') ? '☀️' : '🌙';
+  }
+  if (DOM.themeBtnLight && DOM.themeBtnDark) {
+    DOM.themeBtnLight.classList.toggle('active', s.theme === 'light');
+    DOM.themeBtnDark.classList.toggle('active', s.theme === 'dark');
+  }
+
+  // 2. Ses Ayarları Uygula
+  sounds.enabled = s.soundEnabled;
+  sounds.setVolume(s.volume / 100);
+  if (DOM.soundIcon) {
+    DOM.soundIcon.textContent = s.soundEnabled ? '🔊' : '🔇';
+  }
+
+  // 3. İpucu Butonu Görünürlüğü
+  if (DOM.useHintBtn) {
+    DOM.useHintBtn.style.display = s.hintsEnabled ? 'inline-flex' : 'none';
+  }
+
+  // 4. Ayarlar Modalı Form Elemanlarını Eşitle
+  if (DOM.settingHintsToggle) DOM.settingHintsToggle.checked = s.hintsEnabled;
+  if (DOM.settingKeepTurnToggle) DOM.settingKeepTurnToggle.checked = s.keepTurnOnCorrect;
+  if (DOM.settingSoundToggle) DOM.settingSoundToggle.checked = s.soundEnabled;
+  if (DOM.settingVoiceToggle) DOM.settingVoiceToggle.checked = s.voiceEnabled;
+  if (DOM.settingVolumeSlider) DOM.settingVolumeSlider.value = s.volume;
+  if (DOM.volumeLevelText) DOM.volumeLevelText.textContent = `%${s.volume}`;
+  if (DOM.settingTimerSelect) DOM.settingTimerSelect.value = s.timerMode;
+  if (DOM.settingBotDiffSelect) DOM.settingBotDiffSelect.value = s.botDifficulty;
+}
 
 // ==========================================
 // 2. KONFETİ SİSTEMİ (Canvas Üzerinde)
@@ -365,7 +532,10 @@ const gameState = {
   isVsBot: false,
   isBotExecuting: false,
   botThinkingTimer: null,
-  players: [], // { id, name, avatar, score, isEliminatedThisRound, isBot }
+  settings: loadSettings(),
+  turnTimerInterval: null,
+  turnSecondsLeft: 0,
+  players: [], // { id, name, avatar, score, isEliminatedThisRound, isBot, hintsRemaining }
   roundNumber: 1,
   wordMasterIndex: 0,
   currentGuesserIndex: 0,
@@ -391,6 +561,7 @@ const DOM = {
   playerCountBtns: document.querySelectorAll('.count-btn'),
   playerInputsList: document.getElementById('playerInputsList'),
   startSetupBtn: document.getElementById('startSetupBtn'),
+  openSettingsFromSetupBtn: document.getElementById('openSettingsFromSetupBtn'),
 
   // Gizli Kelime Ekranı
   wordMasterNameDisplay: document.getElementById('wordMasterNameDisplay'),
@@ -416,6 +587,13 @@ const DOM = {
   turkishKeyboard: document.getElementById('turkishKeyboard'),
   openGuessModalBtn: document.getElementById('openGuessModalBtn'),
   endGameEarlyBtn: document.getElementById('endGameEarlyBtn'),
+
+  // Harf İpucu ve Süre Sayacı
+  useHintBtn: document.getElementById('useHintBtn'),
+  currentGuesserHintBadge: document.getElementById('currentGuesserHintBadge'),
+  turnTimerContainer: document.getElementById('turnTimerContainer'),
+  turnTimerSeconds: document.getElementById('turnTimerSeconds'),
+  turnTimerProgressBar: document.getElementById('turnTimerProgressBar'),
 
   // Asmaca Karakteri ve Görsel Elementleri
   hangmanSvg: document.getElementById('hangmanSvg'),
@@ -468,7 +646,25 @@ const DOM = {
   finalScoreTable: document.getElementById('finalScoreTable'),
   restartGameBtn: document.getElementById('restartGameBtn'),
 
-  // Genel & Ses & Ekran
+  // Ayarlar Modalı
+  settingsModal: document.getElementById('settingsModal'),
+  closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
+  saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+  themeBtnLight: document.getElementById('themeBtnLight'),
+  themeBtnDark: document.getElementById('themeBtnDark'),
+  settingHintsToggle: document.getElementById('settingHintsToggle'),
+  settingKeepTurnToggle: document.getElementById('settingKeepTurnToggle'),
+  settingSoundToggle: document.getElementById('settingSoundToggle'),
+  settingVolumeSlider: document.getElementById('settingVolumeSlider'),
+  volumeLevelText: document.getElementById('volumeLevelText'),
+  settingVoiceToggle: document.getElementById('settingVoiceToggle'),
+  settingTimerSelect: document.getElementById('settingTimerSelect'),
+  settingBotDiffSelect: document.getElementById('settingBotDiffSelect'),
+
+  // Üst Çubuk & Genel & Ses & Ekran
+  themeToggleBtn: document.getElementById('themeToggleBtn'),
+  themeIcon: document.getElementById('themeIcon'),
+  settingsToggleBtn: document.getElementById('settingsToggleBtn'),
   soundToggleBtn: document.getElementById('soundToggleBtn'),
   soundIcon: document.getElementById('soundIcon'),
   fullscreenToggleBtn: document.getElementById('fullscreenToggleBtn'),
@@ -622,7 +818,8 @@ DOM.startSetupBtn.addEventListener('click', () => {
       avatar: '🦁',
       score: 0,
       isEliminatedThisRound: false,
-      isBot: false
+      isBot: false,
+      hintsRemaining: gameState.settings.hintsEnabled ? 1 : 0
     });
 
     gameState.players.push({
@@ -631,7 +828,8 @@ DOM.startSetupBtn.addEventListener('click', () => {
       avatar: '🤖',
       score: 0,
       isEliminatedThisRound: false,
-      isBot: true
+      isBot: true,
+      hintsRemaining: 0
     });
 
     // 1. Turda kelimeyi Robot tutsun ki Aybars doğrudan oynamaya başlasın!
@@ -652,7 +850,8 @@ DOM.startSetupBtn.addEventListener('click', () => {
       avatar: AVATARS[i % AVATARS.length].icon,
       score: 0,
       isEliminatedThisRound: false,
-      isBot: false
+      isBot: false,
+      hintsRemaining: gameState.settings.hintsEnabled ? 1 : 0
     });
   }
 
@@ -781,11 +980,14 @@ function startRound() {
     clearTimeout(gameState.botThinkingTimer);
     gameState.botThinkingTimer = null;
   }
+  speech.stop();
+  stopTurnTimer();
 
-  // Tüm oyuncuların elenme durumunu ve puan geçmişini sıfırla
+  // Tüm oyuncuların elenme durumunu, ipucu hakkını ve puan geçmişini sıfırla
   gameState.roundPointsRecord = {};
   gameState.players.forEach(p => {
     p.isEliminatedThisRound = false;
+    p.hintsRemaining = gameState.settings.hintsEnabled ? 1 : 0;
     gameState.roundPointsRecord[p.id] = { letters: 0, fullGuess: 0, masterBonus: 0 };
   });
 
@@ -803,6 +1005,8 @@ function startRound() {
   renderKeyboard();
   updateScoreboardUI();
   updateTurnAnnouncementUI();
+  updateHintButtonUI();
+  startTurnTimer();
 
   switchScreen('game');
 
@@ -858,6 +1062,7 @@ function updateScoreboardUI() {
 function updateTurnAnnouncementUI() {
   if (gameState.currentGuesserIndex === -1) {
     DOM.turnAnnouncementBox.style.display = 'none';
+    updateHintButtonUI();
     return;
   }
 
@@ -876,6 +1081,117 @@ function updateTurnAnnouncementUI() {
     DOM.openGuessModalBtn.style.opacity = '1';
     DOM.openGuessModalBtn.style.pointerEvents = 'auto';
   }
+
+  updateHintButtonUI();
+}
+
+// İpucu Butonu Durumunu Güncelle
+function updateHintButtonUI() {
+  if (!DOM.useHintBtn) return;
+  if (!gameState.settings.hintsEnabled) {
+    DOM.useHintBtn.style.display = 'none';
+    return;
+  }
+  DOM.useHintBtn.style.display = 'inline-flex';
+
+  const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+  if (!currentGuesser || currentGuesser.isBot || !gameState.isRoundActive) {
+    DOM.useHintBtn.disabled = true;
+    DOM.useHintBtn.style.opacity = '0.5';
+    DOM.useHintBtn.style.pointerEvents = 'none';
+    if (DOM.currentGuesserHintBadge) DOM.currentGuesserHintBadge.textContent = '0';
+    return;
+  }
+
+  const rem = currentGuesser.hintsRemaining !== undefined ? currentGuesser.hintsRemaining : 1;
+  if (DOM.currentGuesserHintBadge) DOM.currentGuesserHintBadge.textContent = rem;
+
+  if (rem > 0) {
+    DOM.useHintBtn.disabled = false;
+    DOM.useHintBtn.style.opacity = '1';
+    DOM.useHintBtn.style.pointerEvents = 'auto';
+  } else {
+    DOM.useHintBtn.disabled = true;
+    DOM.useHintBtn.style.opacity = '0.5';
+    DOM.useHintBtn.style.pointerEvents = 'none';
+  }
+}
+
+// ==========================================
+// 9.1. SÜRE SAYACI SİSTEMİ (Turn Timer)
+// ==========================================
+function stopTurnTimer() {
+  if (gameState.turnTimerInterval) {
+    clearInterval(gameState.turnTimerInterval);
+    gameState.turnTimerInterval = null;
+  }
+  if (DOM.turnTimerContainer) {
+    DOM.turnTimerContainer.classList.remove('urgent');
+  }
+}
+
+function startTurnTimer() {
+  stopTurnTimer();
+  const timerSeconds = parseInt(gameState.settings.timerMode, 10);
+  if (!timerSeconds || timerSeconds <= 0) {
+    if (DOM.turnTimerContainer) DOM.turnTimerContainer.style.display = 'none';
+    return;
+  }
+
+  if (DOM.turnTimerContainer) {
+    DOM.turnTimerContainer.style.display = 'block';
+    DOM.turnTimerContainer.classList.remove('urgent');
+  }
+
+  gameState.turnSecondsLeft = timerSeconds;
+  updateTimerDisplay(timerSeconds, timerSeconds);
+
+  gameState.turnTimerInterval = setInterval(() => {
+    if (!gameState.isRoundActive) {
+      stopTurnTimer();
+      return;
+    }
+
+    gameState.turnSecondsLeft--;
+    updateTimerDisplay(gameState.turnSecondsLeft, timerSeconds);
+
+    if (gameState.turnSecondsLeft <= 5 && gameState.turnSecondsLeft > 0) {
+      if (DOM.turnTimerContainer) DOM.turnTimerContainer.classList.add('urgent');
+      sounds.playTimerTick();
+    }
+
+    if (gameState.turnSecondsLeft <= 0) {
+      stopTurnTimer();
+      handleTurnTimeout();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(remaining, max) {
+  if (DOM.turnTimerSeconds) {
+    DOM.turnTimerSeconds.textContent = Math.max(0, remaining);
+  }
+  if (DOM.turnTimerProgressBar) {
+    const pct = Math.max(0, Math.min(100, (remaining / max) * 100));
+    DOM.turnTimerProgressBar.style.width = `${pct}%`;
+  }
+}
+
+function handleTurnTimeout() {
+  if (!gameState.isRoundActive) return;
+  sounds.playTimerAlarm();
+  const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+  showToast(`⏰ Süre Doldu! ${currentGuesser ? currentGuesser.name : ''} sırasını kaçırdı! ⏳`, 2500);
+
+  const timeoutQuotes = HANGMAN_QUOTES.timeUp || [
+    "Tik tak tik tak! Zaman doldu, sıra geçti! ⏳",
+    "Süre bitti arkadaşım, saat tıkır tıkır işliyor! ⏰",
+    "Uyuya kaldınız galiba, kum saati boşaldı! 🏖️"
+  ];
+  const q = timeoutQuotes[Math.floor(Math.random() * timeoutQuotes.length)];
+  triggerHangmanSpeech(q, 2800);
+
+  advanceTurn();
 }
 
 // Kelime Harf Kutularını Çiz
@@ -970,7 +1286,11 @@ function handleLetterGuess(letter) {
     if (currentGuesser.isBot) {
       showToast(`🤖 Robot "${letter}" harfini bildi! (+${pts} Puan)`, 2000);
     } else {
-      showToast(`👏 ${currentGuesser.name} "${letter}" harfini bildi! (+${pts} Puan) Doğru bildiğin için sıra sende kaldı! 🎯`, 3000);
+      if (gameState.settings.keepTurnOnCorrect) {
+        showToast(`👏 ${currentGuesser.name} "${letter}" harfini bildi! (+${pts} Puan) Doğru bildiğin için sıra sende kaldı! 🎯`, 3000);
+      } else {
+        showToast(`👏 ${currentGuesser.name} "${letter}" harfini bildi! (+${pts} Puan)`, 2200);
+      }
     }
 
     // Kelimenin tamamı açıldı mı kontrol et
@@ -983,15 +1303,23 @@ function handleLetterGuess(letter) {
       return;
     }
 
-    // Harfi doğru bilen tekrar tahmin hakkı elde eder (Sıra devredilmez, oyuncuda kalır)
-    updateTurnAnnouncementUI();
-    DOM.turnAnnouncementBox.classList.remove('pulse-glow');
-    void DOM.turnAnnouncementBox.offsetWidth;
-    DOM.turnAnnouncementBox.classList.add('pulse-glow');
+    if (gameState.settings.keepTurnOnCorrect) {
+      // Harfi doğru bilen tekrar tahmin hakkı elde eder (Sıra devredilmez, oyuncuda kalır)
+      updateTurnAnnouncementUI();
+      DOM.turnAnnouncementBox.classList.remove('pulse-glow');
+      void DOM.turnAnnouncementBox.offsetWidth;
+      DOM.turnAnnouncementBox.classList.add('pulse-glow');
 
-    // Eğer robot doğru bildiyse ve tur devam ediyorsa bir sonraki robot tahminini planla
-    if (currentGuesser.isBot && gameState.isRoundActive) {
-      scheduleBotGuess(1400);
+      // Sayacı sıfırla ve yeniden başlat
+      startTurnTimer();
+
+      // Eğer robot doğru bildiyse ve tur devam ediyorsa bir sonraki robot tahminini planla
+      if (currentGuesser.isBot && gameState.isRoundActive) {
+        scheduleBotGuess(1400);
+      }
+    } else {
+      // Kural: Doğru bilse bile sıra bir sonraki oyuncuya geçer
+      advanceTurn();
     }
   } else {
     // YANLIŞ HARF
@@ -1023,6 +1351,7 @@ function handleLetterGuess(letter) {
 
 // Sırayı bir sonraki aktif tahminciye devret
 function advanceTurn() {
+  stopTurnTimer();
   const nextGuesser = getNextActiveGuesserIndex(gameState.currentGuesserIndex);
   if (nextGuesser === -1) {
     // Herkes elendiyse
@@ -1032,6 +1361,7 @@ function advanceTurn() {
   gameState.currentGuesserIndex = nextGuesser;
   updateScoreboardUI();
   updateTurnAnnouncementUI();
+  startTurnTimer();
 
   // Sıradaki tahminci robot ise tahminini planla
   if (gameState.players[gameState.currentGuesserIndex]?.isBot && gameState.isRoundActive) {
@@ -1075,9 +1405,14 @@ function performBotGuess() {
 
   let chosenLetter = null;
 
-  // Robot zekası: %65 ihtimalle doğru harflerden veya yaygın harflerden seçer
-  // %35 ihtimalle yanlış harf seçer (böylece oyun dengeli ve eğlenceli olur)
-  const isSmartMove = Math.random() < 0.65;
+  // Robot zorluk seviyesine göre akıllı tahmin olasılığı
+  let smartProb = 0.65;
+  if (gameState.settings.botDifficulty === 'easy') {
+    smartProb = 0.35;
+  } else if (gameState.settings.botDifficulty === 'smart') {
+    smartProb = 0.90;
+  }
+  const isSmartMove = Math.random() < smartProb;
 
   if (isSmartMove && unrevealedSecretChars.length > 0) {
     // Gizli harflerden birini seç
@@ -1106,7 +1441,7 @@ function performBotGuess() {
     `Hesaplamalar yapıldı! "${chosenLetter}" harfine basıyorum! 🦾`
   ];
   const quote = quotes[Math.floor(Math.random() * quotes.length)];
-  triggerHangmanSpeech(quote, 2200);
+  triggerHangmanSpeech(quote, 2200, true);
 
   // Harf tahminini çalıştır
   gameState.isBotExecuting = true;
@@ -1181,18 +1516,62 @@ DOM.submitFullWordGuessBtn.addEventListener('click', () => {
 
     updateScoreboardUI();
 
-    // Kalan aktif tahminci var mı?
-    const nextGuesser = getNextActiveGuesserIndex(gameState.currentGuesserIndex);
-    if (nextGuesser === -1) {
-      // Kimse kalmadı! Kelimeyi oynatan kişi kazanır
-      handleAllGuessersEliminated();
-    } else {
-      gameState.currentGuesserIndex = nextGuesser;
-      updateScoreboardUI();
-      updateTurnAnnouncementUI();
-    }
+    // Sırayı devret
+    advanceTurn();
   }
 });
+
+// ==========================================
+// 11.1. HARF İPUCU KULLANMA
+// ==========================================
+if (DOM.useHintBtn) {
+  DOM.useHintBtn.addEventListener('click', () => {
+    sounds.playClick();
+    if (!gameState.isRoundActive) return;
+
+    const currentGuesser = gameState.players[gameState.currentGuesserIndex];
+    if (!currentGuesser || currentGuesser.isBot) return;
+
+    if (!gameState.settings.hintsEnabled) {
+      showToast('⚠️ İpucu hakkı ayarlarda kapalı!');
+      return;
+    }
+
+    if ((currentGuesser.hintsRemaining || 0) <= 0) {
+      showToast('⚠️ Bu tur için ipucu hakkını zaten kullandın!');
+      return;
+    }
+
+    // Kelimede henüz açılmamış olan gizli harfleri bul
+    const secretChars = Array.from(new Set(gameState.secretWord.split('').filter(c => c !== ' ')));
+    const unrevealedSecretChars = secretChars.filter(c => !gameState.guessedLetters.has(c));
+
+    if (unrevealedSecretChars.length === 0) {
+      showToast('Açılacak gizli harf kalmadı!');
+      return;
+    }
+
+    // Bir gizli harf seç ve ipucu hakkını tüket
+    const hintLetter = unrevealedSecretChars[Math.floor(Math.random() * unrevealedSecretChars.length)];
+    currentGuesser.hintsRemaining = 0;
+    updateHintButtonUI();
+
+    sounds.playHintSparkle();
+
+    const hintQuotes = HANGMAN_QUOTES.hint || [
+      `Sihirli ipucu geldi! "${hintLetter}" harfi açıldı! ✨`,
+      `Gözlerimi kapattım ve "${hintLetter}" harfini hediye ettim! 🎁`,
+      `Bir ipucu fısıldıyorum: "${hintLetter}"! Hadi bakalım! 🪄`
+    ];
+    const hq = hintQuotes[Math.floor(Math.random() * hintQuotes.length)];
+    triggerHangmanSpeech(hq, 2800);
+
+    showToast(`✨ İpucu kullanıldı! "${hintLetter}" harfi açıldı!`, 2500);
+
+    // Seçilen harfi oyna
+    handleLetterGuess(hintLetter);
+  });
+}
 
 // ==========================================
 // 12. KOMİK ASILAN ADAM TEPKİLERİ VE ANİMASYONLARI
@@ -1203,49 +1582,104 @@ const HANGMAN_QUOTES = {
     "Ayy! İlk hatada beni mi çağırdınız?! 😅",
     "Merhaba! Lütfen nazik olun, ben daha çok yeniyim! 🎩",
     "Hop! Dikkatli seçin, burası biraz rüzgarlı! 🧐",
-    "Kafam çıktı piyasaya, aman dikkat! 🎪"
+    "Kafam çıktı piyasaya, aman dikkat! 🎪",
+    "Pervanem dönmeye başladı, başım dönüyor! 🚁",
+    "Biri bana şapka takmış, çok da yakışmış ama harfi bilemediniz! 👒",
+    "Daha ilk harften yanıldık mı yani? Şaka yapıyorsunuz! 😂",
+    "Eyvah! Havada asılı kalmak hiç tarzım değil! 🌤️",
+    "Ben buraların yabancısıyım, beni erken asmayın lütfen! 🥺",
+    "Ooo merhaba çocuklar! Doğru harfleri seçin de çay içelim! ☕"
   ],
   mistake2: [
     "Hop noluyo?! Gömleğim kırıştı yahu! 👔",
     "Karnım guruldadı, bari bir sesli harf bilin! 🙈",
     "Bir ürperti geldi... Lütfen yanlış basmayın! 🥶",
-    "Gövdem geldi ama kalbim pır pır ediyor! 💓"
+    "Gövdem geldi ama kalbim pır pır ediyor! 💓",
+    "Papyonumu taktım ama düğüne değil darağacına gidiyorum galiba! 🎀",
+    "Tişörtümün çizgileri titremekten dalgalandı! 🌊",
+    "Acıktım valla, pizza ısmarlayan yok mu? 🍕",
+    "Bakın kalbim küt küt atıyor, hissediyorum! 💓",
+    "Lütfen A, E falan deneyin, ne bileyim ipucuna bakın! 📢",
+    "Bedenim oluştu ama ruhum firar etmek üzere! 🏃‍♂️"
   ],
   mistake3: [
     "İmdat! Sol kolum havada kaldı! 🙋‍♂️",
     "Harflere dikkat! Koluma kramp girecek! 😱",
     "Bu harf hiç olmadı ama yaa! 🤦‍♂️",
-    "Sol kolumla el sallıyorum: Kurtarın beni! 🚩"
+    "Sol kolumla el sallıyorum: Kurtarın beni! 🚩",
+    "Sarı eldivenim çok şık ama havada dondu kaldı! 🧤",
+    "Aaa kolum çıktı! Şimdi burnumu kaşıyabilirim en azından! 👃",
+    "Yanlış harf seçme festivali mi var bugün? 🎪",
+    "Sol kolumla size kocaman bir sıfır çiziyorum, bilemediniz! ⭕",
+    "Kolumu indirin lütfen, çok yoruldum! 😫",
+    "Anneee! Bu çocuklar beni asıyor galiba! 📢"
   ],
   mistake4: [
     "Bari iki kolumu birden bağlamasaydınız! 👐",
     "Annemi istiyorum! Yanlış basmayın artık! 📢",
     "Kollarımla alkışlayamıyorum bile yahu! 🥺",
-    "Eyvah eyvah, iki kolum da havalarda! 🤷‍♂️"
+    "Eyvah eyvah, iki kolum da havalarda! 🤷‍♂️",
+    "İki kolumla kuş gibi uçacağım şimdi, kanatlanıyorum! 🦅",
+    "Teslim oluyorum polis amca! Ben bir şey yapmadım! 👮",
+    "Sarılmak istesem sarılamam, bu ne biçim vaziyet! 🫂",
+    "Harf klavyesine bir büyü yapılmış olmalı, her şey ters gidiyor! 🪄",
+    "Eller yukarı, bu bir soygundur! Harflerimi çaldınız! 🤠",
+    "İki kolum da sepet oldu, sallanıp duruyorum! 🧺"
   ],
   mistake5: [
-    "Tir tir titriyorum! Tek bir canım kaldı! 🚨🦵",
+    "Tir tir titriyorum! Tek bir canım kaldı! 🚨",
     "Ayaklarım yerden kesildi, nefes alamıyorum! 😱",
     "Son şansınız! Lütfen kelimeyi kurtarın! 🆘",
-    "Bacaklarım zangır zangır titriyor, bir harf daha bitti! ⚡"
+    "Bacaklarım zangır zangır titriyor, bir harf daha bitti! ⚡",
+    "Tek bacakla bale yapıyorum, bakın kuğu gölü balem! 🩰",
+    "Ter damlalarım sel oldu, yüzme bilen var mı?! 🏊‍♂️",
+    "Gözünüzü seveyim doğru harfe basın, son durağa geldik! 🛑",
+    "Aklınızı başınıza toplayın çocuklar, uçurumun kenarındayız! 🧗",
+    "Sol bacağım uyuştu, ayakkabım yere değmiyor! 👟",
+    "Alarm! Kırmızı alarm! Bir hata daha olursa helvamı yersiniz! 🔔"
   ],
   mistake6: [
     "Gözlerim fırıldak oldu! Yıldızları sayıyorum... ⭐💫",
     "Ben dedim o harf değil diye! Ruhum uçtu... 👻",
     "Olamazzz! Helvam fıstıklı olsun bari! 🍯😵",
-    "Asıldım gittim! Görüşürüz öbür dünyada! 🎪😵"
+    "Asıldım gittim! Görüşürüz öbür dünyada! 🎪😵",
+    "Bayıldım galiba... Biri bana limon koklatsın! 🍋",
+    "Elveda tatlı hayat, elveda güzel Türkçemiz! 🎭",
+    "Pervanem durdu, şalterler kapandı... Bip! 🔌",
+    "Yıldızlar etrafımda halay çekiyor, ne güzelmiş burası! 🌟",
+    "Size küstüm, bir dahaki sefere daha iyi oynayın! 🙈",
+    "Gözlerim çarpı çarpı oldu, game over! 👾"
   ],
   correct: [
     "Oh be! Rahat bir nefes aldım! 🥳",
     "Harikasın! Böyle devam et! 🌟",
     "Süper harf! Kurtuluyorum galiba! 🎈",
     "Helal olsun, işte beklediğim harf! 👏",
-    "Kalbim ferahladı, yaşasın! 💖"
+    "Kalbim ferahladı, yaşasın! 💖",
+    "Aferin sana! Zekana hayran kaldım! 🧠✨",
+    "İşte bu! Adım adım özgürlüğe! 🕊️",
+    "Harikasınız çocuklar, şapkam bile sevindi! 🎩",
+    "Bingo! İşte aradığımız harf tam da buydu! 🎯",
+    "Korkularım uçtu gitti, yaşasın! 🌈"
+  ],
+  hint: [
+    "Sihirli bir kuş kulağıma ipucu fısıldadı! ✨",
+    "Dayanamadım bir harfi hediye ettim, hadi iyisiniz! 🎁",
+    "İşte beklediğiniz kurtarıcı harf parıldadı! 🌟",
+    "Biraz yardımın kimseye zararı olmaz, işte harf! 🪄",
+    "Gözlerimi kapattım ve gizli bir harfi açıverdim! 🪄"
+  ],
+  timeUp: [
+    "Tik tak tik tak! Zaman doldu, sıra geçti! ⏳",
+    "Süre bitti arkadaşım, saat tıkır tıkır işliyor! ⏰",
+    "Uyuya kaldınız galiba, kum saati boşaldı! 🏖️",
+    "Zaman su gibi aktı! Bir dahaki tura daha hızlı ol! 🏃‍♂️💨"
   ],
   gasp: [
     "Aman tanrım! O kelime hiç olmadı! 😱",
     "Eyvah, büyük risk aldın ve elendin! 💥",
-    "Cesurcaydı ama maalesef yanlış! 🙈"
+    "Cesurcaydı ama maalesef yanlış! 🙈",
+    "Bütün şansını tek kelimede harcadın ve elendin! 🛸"
   ],
   tickle: [
     "Hehe gıdıklama beni! 😂",
@@ -1259,7 +1693,7 @@ const HANGMAN_QUOTES = {
 let hangmanSpeechTimer = null;
 let hangmanReactionTimer = null;
 
-function triggerHangmanSpeech(text, duration = 2800) {
+function triggerHangmanSpeech(text, duration = 2800, isBot = false) {
   if (!DOM.hangmanBubble || !DOM.hangmanBubbleText) return;
 
   if (hangmanSpeechTimer) {
@@ -1271,6 +1705,9 @@ function triggerHangmanSpeech(text, duration = 2800) {
   DOM.hangmanBubble.classList.remove('active');
   void DOM.hangmanBubble.offsetWidth; // Reflow tetikle
   DOM.hangmanBubble.classList.add('active');
+
+  // Canlı Türkçe Seslendirme (Web Speech API)
+  speech.speak(text, isBot);
 
   hangmanSpeechTimer = setTimeout(() => {
     if (DOM.hangmanBubble) DOM.hangmanBubble.classList.remove('active');
@@ -1513,6 +1950,8 @@ function setHangmanDeadFace() {
 // Durum A: Bir oyuncu kelimeyi bildi / bitirdi
 function handleRoundVictory(winnerPlayer, reason) {
   gameState.isRoundActive = false;
+  stopTurnTimer();
+  speech.stop();
   sounds.playVictory();
   confetti.launch(3500);
 
@@ -1531,6 +1970,8 @@ function handleRoundVictory(winnerPlayer, reason) {
 // Durum B: 7. KURAL - Kimse bilemeden adam asılırsa
 function handleHangmanCompleted() {
   gameState.isRoundActive = false;
+  stopTurnTimer();
+  speech.stop();
   setHangmanDeadFace();
   sounds.playHangmanLost();
 
@@ -1549,6 +1990,8 @@ function handleHangmanCompleted() {
 // Durum C: Tüm tahminciler elendiyse
 function handleAllGuessersEliminated() {
   gameState.isRoundActive = false;
+  stopTurnTimer();
+  speech.stop();
   sounds.playHangmanLost();
 
   const master = gameState.players[gameState.wordMasterIndex];
@@ -1856,10 +2299,121 @@ function initCardLetterBackgrounds() {
 }
 
 // ==========================================
+// 15.1. AYARLAR MENÜSÜ & TEMA YÖNETİMİ
+// ==========================================
+
+function openSettingsModal() {
+  sounds.playClick();
+  applySettings(); // Form elemanlarını mevcut ayarlarla senkronize et
+  if (DOM.settingsModal) {
+    DOM.settingsModal.classList.add('active');
+  }
+}
+
+function closeSettingsModal() {
+  if (DOM.settingsModal) {
+    DOM.settingsModal.classList.remove('active');
+  }
+}
+
+// Ayarlar modalını açma butonları
+if (DOM.settingsToggleBtn) {
+  DOM.settingsToggleBtn.addEventListener('click', openSettingsModal);
+}
+if (DOM.openSettingsFromSetupBtn) {
+  DOM.openSettingsFromSetupBtn.addEventListener('click', openSettingsModal);
+}
+if (DOM.closeSettingsModalBtn) {
+  DOM.closeSettingsModalBtn.addEventListener('click', () => {
+    sounds.playClick();
+    closeSettingsModal();
+  });
+}
+
+// Modal dışına tıklayınca kapatma
+if (DOM.settingsModal) {
+  DOM.settingsModal.addEventListener('click', (e) => {
+    if (e.target === DOM.settingsModal) {
+      closeSettingsModal();
+    }
+  });
+}
+
+// Üst Bar Hızlı Tema Butonu (Gündüz / Gece)
+if (DOM.themeToggleBtn) {
+  DOM.themeToggleBtn.addEventListener('click', () => {
+    sounds.playClick();
+    const currentTheme = gameState.settings.theme;
+    const nextTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+    saveSettings({ theme: nextTheme });
+    showToast(nextTheme === 'dark' ? '🌙 Karanlık Mod Açıldı' : '☀️ Aydınlık Mod Açıldı', 2000);
+  });
+}
+
+// Ayarlar Modalındaki Tema Seçenek Butonları
+if (DOM.themeBtnLight && DOM.themeBtnDark) {
+  DOM.themeBtnLight.addEventListener('click', () => {
+    sounds.playClick();
+    DOM.themeBtnLight.classList.add('active');
+    DOM.themeBtnDark.classList.remove('active');
+    document.documentElement.setAttribute('data-theme', 'light');
+    if (DOM.themeIcon) DOM.themeIcon.textContent = '🌙';
+  });
+
+  DOM.themeBtnDark.addEventListener('click', () => {
+    sounds.playClick();
+    DOM.themeBtnDark.classList.add('active');
+    DOM.themeBtnLight.classList.remove('active');
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (DOM.themeIcon) DOM.themeIcon.textContent = '☀️';
+  });
+}
+
+// Ses Seviyesi Slider'ı Canlı Tepki
+if (DOM.settingVolumeSlider) {
+  DOM.settingVolumeSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    if (DOM.volumeLevelText) DOM.volumeLevelText.textContent = `%${val}`;
+    sounds.setVolume(val / 100);
+  });
+}
+
+// Ayarları Kaydet Butonu
+if (DOM.saveSettingsBtn) {
+  DOM.saveSettingsBtn.addEventListener('click', () => {
+    sounds.playClick();
+    const chosenTheme = DOM.themeBtnDark?.classList.contains('active') ? 'dark' : 'light';
+    const hints = DOM.settingHintsToggle ? DOM.settingHintsToggle.checked : true;
+    const keepTurn = DOM.settingKeepTurnToggle ? DOM.settingKeepTurnToggle.checked : true;
+    const soundOn = DOM.settingSoundToggle ? DOM.settingSoundToggle.checked : true;
+    const vol = DOM.settingVolumeSlider ? parseInt(DOM.settingVolumeSlider.value, 10) : 80;
+    const voiceOn = DOM.settingVoiceToggle ? DOM.settingVoiceToggle.checked : true;
+    const timer = DOM.settingTimerSelect ? parseInt(DOM.settingTimerSelect.value, 10) : 0;
+    const botDiff = DOM.settingBotDiffSelect ? DOM.settingBotDiffSelect.value : 'normal';
+
+    saveSettings({
+      theme: chosenTheme,
+      hintsEnabled: hints,
+      keepTurnOnCorrect: keepTurn,
+      soundEnabled: soundOn,
+      volume: vol,
+      voiceEnabled: voiceOn,
+      timerMode: timer,
+      botDifficulty: botDiff
+    });
+
+    closeSettingsModal();
+    showToast('✨ Ayarlar kaydedildi!', 2200);
+  });
+}
+
+// ==========================================
 // 16. İLK BAŞLATMA
 // ==========================================
+applySettings();
 renderPlayerInputs();
 checkOrientationTip();
 initCardLetterBackgrounds();
+
 
 
