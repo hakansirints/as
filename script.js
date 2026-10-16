@@ -1396,11 +1396,15 @@ if (DOM.hangmanCharacter) {
 }
 
 // ==========================================
-// 15. BEYAZ KART HARF VE KELİME ARKA PLAN EFEKTİ
+// 15. BEYAZ KART HARF VE KELİME ARKA PLAN EFEKTİ (SADECE GİRİŞ KARTINDA)
 // ==========================================
 function initCardLetterBackgrounds() {
-  const cards = document.querySelectorAll('.screen-card');
-  if (!cards.length) return;
+  // Arka plan animasyonu sadece giriş sayfasındaki kartta (#setupScreen) olsun, oyun ekranında olmasın
+  const setupCard = document.getElementById('setupScreen');
+  if (!setupCard) return;
+
+  // Diğer kartlarda (özellikle oyun oynanan kartta) varsa tamamen kaldır
+  document.querySelectorAll('.card-letters-watermark').forEach(el => el.remove());
 
   const glyphData = [
     // 1. Satır
@@ -1433,38 +1437,32 @@ function initCardLetterBackgrounds() {
     { text: 'PUAN', size: 13, rot: 7, top: 88, left: 82, dur: 8.2, delay: -3.1, anim: 'glyphGlow4', color: '#f59e0b' }
   ];
 
-  cards.forEach(card => {
-    const old = card.querySelector('.card-letters-watermark');
-    if (old) old.remove();
+  const watermark = document.createElement('div');
+  watermark.className = 'card-letters-watermark';
+  watermark.setAttribute('aria-hidden', 'true');
 
-    const watermark = document.createElement('div');
-    watermark.className = 'card-letters-watermark';
-    watermark.setAttribute('aria-hidden', 'true');
+  glyphData.forEach(item => {
+    const span = document.createElement('span');
+    span.className = 'card-bg-glyph';
+    span.textContent = item.text;
+    span.style.fontSize = `${item.size}px`;
+    span.style.top = `${item.top}%`;
+    span.style.left = `${item.left}%`;
+    span.style.setProperty('--rot', `${item.rot}deg`);
+    span.style.setProperty('--accent-color', item.color);
+    span.style.animation = `${item.anim} ${item.dur}s ease-in-out infinite alternate`;
+    span.style.animationDelay = `${item.delay}s`;
 
-    glyphData.forEach(item => {
-      const span = document.createElement('span');
-      span.className = 'card-bg-glyph';
-      span.textContent = item.text;
-      span.style.fontSize = `${item.size}px`;
-      span.style.top = `${item.top}%`;
-      span.style.left = `${item.left}%`;
-      span.style.setProperty('--rot', `${item.rot}deg`);
-      span.style.setProperty('--accent-color', item.color);
-      span.style.animation = `${item.anim} ${item.dur}s ease-in-out infinite alternate`;
-      span.style.animationDelay = `${item.delay}s`;
-
-      watermark.appendChild(span);
-    });
-
-    card.prepend(watermark);
+    watermark.appendChild(span);
   });
 
-  // Belirli aralıklarla rastgele bir harf veya kelimenin saydamlığını ve belirginliğini daha da yükselt
-  setInterval(() => {
-    const activeCard = document.querySelector('.screen-card.active');
-    if (!activeCard) return;
+  setupCard.prepend(watermark);
 
-    const glyphs = activeCard.querySelectorAll('.card-bg-glyph');
+  // Sadece giriş ekranı açıkken rastgele bir harf veya kelimenin saydamlığını ve belirginliğini yükselt
+  setInterval(() => {
+    if (!setupCard.classList.contains('active')) return;
+
+    const glyphs = setupCard.querySelectorAll('.card-bg-glyph');
     if (!glyphs.length) return;
 
     const randomIndex = Math.floor(Math.random() * glyphs.length);
