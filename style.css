@@ -2432,3 +2432,43 @@ input:checked + .toggle-slider:before {
   color: #f8fafc;
 }
 
+/* Örnek Ses Butonları */
+.sample-voice-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sample-voice-btn {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+  border: none;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.25);
+  transition: transform 0.15s ease, filter 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sample-voice-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.sample-voice-btn:active {
+  transform: translateY(0);
+}
+
+[data-theme="dark"] .sample-voice-btn {
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  color: #f8fafc;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+

@@ -660,6 +660,9 @@ const DOM = {
   settingVoiceToggle: document.getElementById('settingVoiceToggle'),
   settingTimerSelect: document.getElementById('settingTimerSelect'),
   settingBotDiffSelect: document.getElementById('settingBotDiffSelect'),
+  playSampleMascotBtn: document.getElementById('playSampleMascotBtn'),
+  playSampleHappyBtn: document.getElementById('playSampleHappyBtn'),
+  playSampleRobotBtn: document.getElementById('playSampleRobotBtn'),
 
   // Üst Çubuk & Genel & Ses & Ekran
   themeToggleBtn: document.getElementById('themeToggleBtn'),
@@ -2404,6 +2407,43 @@ if (DOM.saveSettingsBtn) {
 
     closeSettingsModal();
     showToast('✨ Ayarlar kaydedildi!', 2200);
+  });
+}
+
+// Örnek Sesleri Dinleme Butonları
+if (DOM.playSampleMascotBtn) {
+  DOM.playSampleMascotBtn.addEventListener('click', () => {
+    speech.stop();
+    const audio = new Audio('audio/ornek_maskot.mp3');
+    audio.preservesPitch = false;
+    audio.playbackRate = 1.18;
+    audio.volume = gameState.settings.volume / 100;
+    audio.play().catch(e => console.warn(e));
+    showToast('🎭 Şaşkın Maskot: "Hop noluyor! Gömleğim kırıştı yahu!"', 3000);
+  });
+}
+
+if (DOM.playSampleHappyBtn) {
+  DOM.playSampleHappyBtn.addEventListener('click', () => {
+    speech.stop();
+    const audio = new Audio('audio/ornek_sevincli.mp3');
+    audio.preservesPitch = false;
+    audio.playbackRate = 1.15;
+    audio.volume = gameState.settings.volume / 100;
+    audio.play().catch(e => console.warn(e));
+    showToast('🎉 Sevinçli Maskot: "Oh be! Harikasın, rahat bir nefes aldım!"', 3000);
+  });
+}
+
+if (DOM.playSampleRobotBtn) {
+  DOM.playSampleRobotBtn.addEventListener('click', () => {
+    speech.stop();
+    const audio = new Audio('audio/ornek_robot.mp3');
+    audio.preservesPitch = false;
+    audio.playbackRate = 0.90;
+    audio.volume = gameState.settings.volume / 100;
+    audio.play().catch(e => console.warn(e));
+    showToast('🤖 Robot: "Bip-bop! Devrelerim çalışıyor, harika bir tahmin!"', 3000);
   });
 }
 
