@@ -1,0 +1,6 @@
+.env
+.env.local
+*.key
+tts_env/
+__pycache__/
+*.pyc
